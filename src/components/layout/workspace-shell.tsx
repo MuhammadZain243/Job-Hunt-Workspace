@@ -34,18 +34,18 @@ export function WorkspaceShell({
 
   return (
     <div className="min-h-screen bg-[linear-gradient(165deg,oklch(0.985_0.008_95)_0%,oklch(0.97_0.012_230)_100%)]">
-      <div className="mx-auto flex min-h-screen w-full max-w-7xl">
-        <aside className="sticky top-0 hidden h-screen w-60 shrink-0 border-r border-sidebar-border bg-sidebar px-3 py-5 md:flex md:flex-col">
-          <div className="mb-6 px-3">
+      <div className="flex min-h-screen w-full">
+        <aside className="sticky top-0 hidden h-screen w-70 shrink-0 border-r border-sidebar-border/90 bg-sidebar/95 px-4 py-6 md:flex md:flex-col">
+          <div className="mb-8 px-3">
             <p className="text-xs font-medium tracking-[0.14em] text-muted-foreground uppercase">
               Job Hunt
             </p>
-            <p className="mt-1 text-lg font-semibold tracking-tight text-sidebar-foreground">
+            <p className="mt-1 text-xl font-semibold tracking-tight text-sidebar-foreground">
               Workspace
             </p>
           </div>
           <SidebarNav pathname={pathname} className="flex-1" />
-          <div className="mt-auto border-t border-sidebar-border px-3 pt-4">
+          <div className="mt-auto border-t border-sidebar-border px-3 pt-5">
             <p className="truncate text-sm font-medium text-sidebar-foreground">
               {userName}
             </p>
@@ -54,7 +54,7 @@ export function WorkspaceShell({
         </aside>
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="sticky top-0 z-20 flex h-14 items-center justify-between gap-3 border-b border-border bg-background px-4 md:px-6">
+          <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-3 border-b border-border/80 bg-background/92 px-4 backdrop-blur-sm md:px-8">
             <div className="flex items-center gap-2 md:hidden">
               <Sheet open={open} onOpenChange={setOpen}>
                 <SheetTrigger
@@ -84,15 +84,20 @@ export function WorkspaceShell({
               </span>
             </div>
 
-            <div className="hidden text-sm text-muted-foreground md:block">
-              Private owner workspace
+            <div className="hidden md:block">
+              <p className="text-sm font-medium text-foreground">
+                Private owner workspace
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Dashboard foundation and navigation shell
+              </p>
             </div>
 
             <LogoutButton />
           </header>
 
-          <main className="flex-1 px-4 py-6 pb-24 md:px-6 md:py-8 md:pb-8">
-            {children}
+          <main className="flex-1 px-4 py-5 pb-24 md:px-8 md:py-8 md:pb-8">
+            <div className="mx-auto w-full max-w-6xl">{children}</div>
           </main>
 
           <nav
