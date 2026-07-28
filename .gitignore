@@ -1,0 +1,44 @@
+node_modules/
+.next/
+out/
+coverage/
+playwright-report/
+test-results/
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+.vscode/settings.local.json
+.tmp/
+tmp/
+local-data/
+private-uploads/
+.data/
+*.pem
+*.key
+*.p12
+*.tsbuildinfo
+
+# Private MCP client configuration. Commit only reviewed *.example.* files.
+.mcp.json
+mcp.local.json
+.vscode/mcp.json
+.claude/
+.codex/
+
+# Duplicate documentation pack after promotion to repository root
+job-hunt-agent-pack/
+.gitignore.pack
+
+# Local agent/planning files kept out of the repository
+AGENT.md
+AGENTS.md
+CLAUDE.md
+TREE.md
+UI_TOOLING_SETUP.md
+adr/
+backlog/
+config/
+docs/
+prompts/
