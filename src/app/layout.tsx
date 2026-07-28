@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Source_Sans_3, IBM_Plex_Mono } from "next/font/google";
 
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "@/components/ui/toaster";
 
 import "./globals.css";
 
@@ -41,7 +41,8 @@ export default function RootLayout({
       className={`${sourceSans.variable} ${plexMono.variable} h-full antialiased`}
     >
       <body suppressHydrationWarning className="min-h-full flex flex-col font-sans">
-        <TooltipProvider>{children}</TooltipProvider>
+        {children}
+        <Toaster />
       </body>
     </html>
   );
