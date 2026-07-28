@@ -20,7 +20,7 @@ export default async function LoginPage() {
   await redirectIfAuthenticated();
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[linear-gradient(165deg,_oklch(0.985_0.008_95)_0%,_oklch(0.97_0.012_230)_100%)] px-4">
+    <div className="flex min-h-screen items-center justify-center bg-[linear-gradient(165deg,oklch(0.985_0.008_95)_0%,oklch(0.97_0.012_230)_100%)] px-4">
       <main className="w-full max-w-md">
         <div className="mb-8 text-center">
           <p className="text-xs font-medium tracking-[0.16em] text-muted-foreground uppercase">

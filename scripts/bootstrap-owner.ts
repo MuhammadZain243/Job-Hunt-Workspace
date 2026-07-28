@@ -39,8 +39,8 @@ async function main() {
     );
   }
 
-  if (password.length < 12) {
-    throw new Error("Password must be at least 12 characters.");
+  if (password.length < 8) {
+    throw new Error("Password must be at least 8 characters.");
   }
 
   const client = await getMongoClient();
