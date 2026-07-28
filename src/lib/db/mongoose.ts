@@ -4,22 +4,14 @@ import mongoose from "mongoose";
 
 import { getServerEnv } from "@/lib/env/server";
 
-type MongooseGlobalCache = {
-  conn: typeof mongoose | undefined;
-  promise: Promise<typeof mongoose> | undefined;
-};
-
-function getMongooseCache(): MongooseGlobalCache {
-  const globalWithMongoose = globalThis as typeof globalThis & {
-    __jobHuntMongoose?: MongooseGlobalCache;
-  };
-  if (!globalWithMongoose.__jobHuntMongoose) {
-    globalWithMongoose.__jobHuntMongoose = {
+function getMongooseCache() {
+  if (!globalThis.__jobHuntMongoose) {
+    globalThis.__jobHuntMongoose = {
       conn: undefined,
       promise: undefined,
     };
   }
-  return globalWithMongoose.__jobHuntMongoose;
+  return globalThis.__jobHuntMongoose;
 }
 
 /**

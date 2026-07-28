@@ -15,19 +15,11 @@ const ATLAS_CLIENT_OPTIONS: MongoClientOptions = {
   retryReads: true,
 };
 
-type MongoGlobalCache = {
-  client: MongoClient | undefined;
-  promise: Promise<MongoClient> | undefined;
-};
-
-function getMongoCache(): MongoGlobalCache {
-  const globalWithMongo = globalThis as typeof globalThis & {
-    __jobHuntMongo?: MongoGlobalCache;
-  };
-  if (!globalWithMongo.__jobHuntMongo) {
-    globalWithMongo.__jobHuntMongo = { client: undefined, promise: undefined };
+function getMongoCache() {
+  if (!globalThis.__jobHuntMongo) {
+    globalThis.__jobHuntMongo = { client: undefined, promise: undefined };
   }
-  return globalWithMongo.__jobHuntMongo;
+  return globalThis.__jobHuntMongo;
 }
 
 /**

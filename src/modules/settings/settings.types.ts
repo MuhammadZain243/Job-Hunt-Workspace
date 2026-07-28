@@ -7,6 +7,7 @@ export type AppSettings = {
   dailyEmailLimit: number;
   minFollowUpHours: number;
   cvStorageProvider: CvStorageProvider;
+  defaultCvId?: string | null;
   autoFollowUpsEnabled: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -19,5 +20,6 @@ export type AppSettingsCreateInput = {
   dailyEmailLimit?: number;
   minFollowUpHours?: number;
   cvStorageProvider?: CvStorageProvider;
+  defaultCvId?: string | null;
   autoFollowUpsEnabled?: boolean;
 };

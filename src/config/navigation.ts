@@ -1,15 +1,8 @@
 export type NavItem = {
   title: string;
   href: string;
-  icon:
-    | "layout-dashboard"
-    | "building-2"
-    | "briefcase"
-    | "kanban"
-    | "users"
-    | "mail"
-    | "file-text"
-    | "settings";
+  /** Lucide-style icon name used by the shell icon map. */
+  icon: string;
   enabled: boolean;
   comingSoon?: boolean;
 };
