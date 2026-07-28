@@ -33,7 +33,7 @@ export function WorkspaceShell({
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[linear-gradient(165deg,_oklch(0.985_0.008_95)_0%,_oklch(0.97_0.012_230)_100%)]">
+    <div className="min-h-screen bg-[linear-gradient(165deg,oklch(0.985_0.008_95)_0%,oklch(0.97_0.012_230)_100%)]">
       <div className="mx-auto flex min-h-screen w-full max-w-7xl">
         <aside className="sticky top-0 hidden h-screen w-60 shrink-0 border-r border-sidebar-border bg-sidebar px-3 py-5 md:flex md:flex-col">
           <div className="mb-6 px-3">
