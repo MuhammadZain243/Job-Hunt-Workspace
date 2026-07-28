@@ -39,9 +39,10 @@ export function DisconnectS3Button() {
               Disconnect S3?
             </DialogTitle>
             <DialogDescription className="text-sm leading-6 text-muted-foreground">
-              This removes the saved S3 configuration and revokes stored
-              credentials. Active storage will fall back to another connected
-              provider when possible.
+              This permanently deletes the saved S3 connection and encrypted
+              credentials from the database. Existing CV files stay listed, but
+              S3 downloads will fail until you reconnect. Active storage will
+              fall back to another connected provider when possible.
             </DialogDescription>
           </DialogHeader>
 

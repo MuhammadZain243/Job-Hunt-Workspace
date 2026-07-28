@@ -100,11 +100,11 @@ function getFeedback(
     }
     if (disconnectSuccess === "cloudinary") {
       return {
-        success: "Cloudinary disconnected and configuration removed.",
+        success: "Cloudinary disconnected. Configuration deleted from the database.",
       };
     }
     if (disconnectSuccess === "s3") {
-      return { success: "S3 disconnected and configuration removed." };
+      return { success: "S3 disconnected. Configuration deleted from the database." };
     }
     if (disconnectError === "cloudinary") {
       return { error: "Could not disconnect Cloudinary. Try again." };

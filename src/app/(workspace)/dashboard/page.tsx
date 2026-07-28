@@ -3,7 +3,6 @@ import { ArrowRight, LockKeyhole, Sparkles, Waypoints } from "lucide-react";
 
 import { FadeIn } from "@/components/motion/fade-in";
 import { EmptyState } from "@/components/states/empty-state";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 

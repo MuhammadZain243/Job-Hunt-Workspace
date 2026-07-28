@@ -1,7 +1,7 @@
 import "server-only";
 
 import mammoth from "mammoth";
-import { PDFParse } from "pdf-parse";
+import { extractText } from "unpdf";
 
 import { ValidationError } from "@/lib/errors/app-error";
 
@@ -9,28 +9,22 @@ export async function extractTextFromCv(input: {
   mimeType: string;
   bytes: Uint8Array;
 }): Promise<string> {
-  const buffer = Buffer.from(input.bytes);
-
   if (input.mimeType === "application/pdf") {
-    const parser = new PDFParse({ data: buffer });
-    try {
-      const parsed = await parser.getText();
-      const text = parsed.text?.trim() ?? "";
-      if (!text) {
-        throw new ValidationError(
-          "Could not extract text from this PDF. OCR is not enabled yet.",
-        );
-      }
-      return text;
-    } finally {
-      await parser.destroy();
+    const parsed = await extractText(input.bytes, { mergePages: true });
+    const text = (typeof parsed.text === "string" ? parsed.text : "").trim();
+    if (!text) {
+      throw new ValidationError(
+        "Could not extract text from this PDF. OCR is not enabled yet.",
+      );
     }
+    return text;
   }
 
   if (
     input.mimeType ===
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
   ) {
+    const buffer = Buffer.from(input.bytes);
     const parsed = await mammoth.extractRawText({ buffer });
     const text = parsed.value?.trim() ?? "";
     if (!text) {

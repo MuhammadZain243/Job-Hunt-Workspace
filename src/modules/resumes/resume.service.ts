@@ -311,26 +311,7 @@ export async function createResumeDownloadUrl(input: {
     throw new NotFoundError("Resume not found");
   }
 
-  const url =
-    resume.storageProvider === "local"
-      ? `/api/resumes/download?resumeId=${encodeURIComponent(resume._id.toString())}`
-      : await (
-          await getCvStorageProviderForName(
-            input.userId,
-            resume.storageProvider as CvStorageProviderName,
-          )
-        ).createDownloadUrl(
-          {
-            userId: input.userId,
-            storageKey: resume.storageKey,
-            storageProvider: resume.storageProvider as CvStorageProviderName,
-            storageMetadata: resume.storageMetadata as Record<
-              string,
-              string | number | boolean | null | undefined
-            >,
-          },
-          120,
-        );
+  const url = `/api/resumes/download?resumeId=${encodeURIComponent(resume._id.toString())}`;
 
   await recordAuditEvent({
     userId: input.userId,

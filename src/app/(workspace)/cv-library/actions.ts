@@ -28,24 +28,33 @@ export async function uploadResumeAction(formData: FormData): Promise<void> {
   const { user } = await requireSession();
   const file = formData.get("file");
 
-  if (!(file instanceof File)) {
+  if (!(file instanceof Blob) || file.size === 0) {
     feedbackRedirect("error=missing-file");
   }
+
+  const fileName =
+    file instanceof File && file.name
+      ? file.name
+      : String(formData.get("fileName") ?? "cv.pdf");
 
   try {
     const bytes = new Uint8Array(await file.arrayBuffer());
     const resume = await uploadResume({
       userId: user.id,
-      fileName: file.name,
+      fileName,
       declaredMime: file.type,
       bytes,
       name: String(formData.get("name") ?? ""),
     });
 
-    await enqueueResumeExtraction({
-      userId: user.id,
-      resumeId: resume.id,
-    });
+    try {
+      await enqueueResumeExtraction({
+        userId: user.id,
+        resumeId: resume.id,
+      });
+    } catch {
+      // Upload already succeeded; extraction can be retried from the CV library.
+    }
 
     revalidatePath("/cv-library");
     feedbackRedirect(`success=uploaded&resumeId=${resume.id}`);
@@ -54,9 +63,15 @@ export async function uploadResumeAction(formData: FormData): Promise<void> {
       throw error;
     }
     if (isAppError(error)) {
-      feedbackRedirect(`error=${encodeURIComponent(error.code.toLowerCase())}`);
+      feedbackRedirect(
+        `error=${encodeURIComponent(error.code.toLowerCase())}&detail=${encodeURIComponent(error.message)}`,
+      );
     }
-    feedbackRedirect("error=upload-failed");
+    feedbackRedirect(
+      `error=upload-failed&detail=${encodeURIComponent(
+        error instanceof Error ? error.message : "Upload failed",
+      )}`,
+    );
   }
 }
 

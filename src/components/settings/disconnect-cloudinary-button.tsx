@@ -45,9 +45,10 @@ export function DisconnectCloudinaryButton() {
               Disconnect Cloudinary?
             </DialogTitle>
             <DialogDescription className="text-sm leading-6 text-muted-foreground">
-              This removes the saved Cloudinary configuration and revokes stored
-              credentials. If Cloudinary is the active provider, storage will
-              switch to local.
+              This permanently deletes the saved Cloudinary connection and
+              encrypted credentials from the database. Existing CV files stay
+              listed, but Cloudinary downloads will fail until you reconnect.
+              If Cloudinary is the active provider, storage switches to local.
             </DialogDescription>
           </DialogHeader>
 

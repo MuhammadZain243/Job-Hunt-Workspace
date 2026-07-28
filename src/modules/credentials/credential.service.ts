@@ -4,10 +4,15 @@ import { Types } from "mongoose";
 
 import { connectMongoose } from "@/lib/db/mongoose";
 import {
+  ProviderAuthError,
+  ValidationError,
+} from "@/lib/errors/app-error";
+import {
   decryptSecret,
   encryptSecret,
   fingerprintSecret,
 } from "@/lib/encryption/crypto";
+import { logger } from "@/lib/logger/logger";
 import { EncryptedCredentialModel } from "@/modules/credentials/credential.model";
 import { ProviderConnectionModel } from "@/modules/credentials/provider-connection.model";
 import type { StoredCredentialProvider } from "@/modules/credentials/credential.types";
@@ -33,9 +38,13 @@ export async function saveProviderSecret(input: {
     userId: input.userId,
     provider: input.provider,
     revokedAt: null,
-  }).lean();
+  });
 
-  const credentialId = existing?._id?.toString() ?? new Types.ObjectId().toString();
+  // AAD includes credentialId. The Mongo _id used at encrypt time MUST match
+  // the stored document _id or decrypt will fail authentication.
+  const credentialObjectId = existing?._id ?? new Types.ObjectId();
+  const credentialId = credentialObjectId.toString();
+
   const payload = encryptSecret(input.secret, {
     userId: input.userId,
     provider: input.provider,
@@ -44,9 +53,28 @@ export async function saveProviderSecret(input: {
 
   const fingerprint = fingerprintSecret(input.secret);
 
-  const credential = await EncryptedCredentialModel.findOneAndUpdate(
-    { userId: input.userId, provider: input.provider, revokedAt: null },
-    {
+  let credential;
+  if (existing) {
+    credential = await EncryptedCredentialModel.findOneAndUpdate(
+      { _id: existing._id },
+      {
+        $set: {
+          accountLabel: input.accountLabel,
+          ciphertext: payload.ciphertext,
+          iv: payload.iv,
+          authTag: payload.authTag,
+          algorithm: payload.algorithm,
+          keyVersion: payload.keyVersion,
+          secretFingerprint: fingerprint,
+          rotatedAt: new Date(),
+          revokedAt: null,
+        },
+      },
+      { returnDocument: "after" },
+    );
+  } else {
+    credential = await EncryptedCredentialModel.create({
+      _id: credentialObjectId,
       userId: input.userId,
       provider: input.provider,
       accountLabel: input.accountLabel,
@@ -56,15 +84,14 @@ export async function saveProviderSecret(input: {
       algorithm: payload.algorithm,
       keyVersion: payload.keyVersion,
       secretFingerprint: fingerprint,
-      rotatedAt: existing ? new Date() : null,
+      rotatedAt: null,
       revokedAt: null,
-    },
-    {
-      upsert: true,
-      returnDocument: "after",
-      setDefaultsOnInsert: true,
-    },
-  );
+    });
+  }
+
+  if (!credential) {
+    throw new ValidationError("Could not save provider credentials");
+  }
 
   await ProviderConnectionModel.findOneAndUpdate(
     { userId: input.userId, provider: input.provider },
@@ -107,20 +134,36 @@ export async function getProviderSecret(input: {
     return null;
   }
 
-  return decryptSecret(
-    {
-      ciphertext: credential.ciphertext,
-      iv: credential.iv,
-      authTag: credential.authTag,
-      algorithm: "aes-256-gcm",
-      keyVersion: credential.keyVersion,
-    },
-    {
-      userId: input.userId,
-      provider: input.provider,
-      credentialId: credential._id.toString(),
-    },
-  );
+  try {
+    return decryptSecret(
+      {
+        ciphertext: credential.ciphertext,
+        iv: credential.iv,
+        authTag: credential.authTag,
+        algorithm: "aes-256-gcm",
+        keyVersion: credential.keyVersion,
+      },
+      {
+        userId: input.userId,
+        provider: input.provider,
+        credentialId: credential._id.toString(),
+      },
+    );
+  } catch (error) {
+    logger.warn(
+      {
+        provider: input.provider,
+        reason:
+          error instanceof Error
+            ? error.message.slice(0, 120)
+            : "decrypt_failed",
+      },
+      "Failed to decrypt provider credential",
+    );
+    throw new ProviderAuthError(
+      "Saved credentials could not be decrypted. Disconnect and reconnect the provider.",
+    );
+  }
 }
 
 export async function listProviderConnections(userId: string) {
@@ -148,34 +191,15 @@ export async function disconnectProviderConfiguration(input: {
 }) {
   await connectMongoose();
 
-  await EncryptedCredentialModel.updateMany(
-    {
-      userId: input.userId,
-      provider: input.provider,
-      revokedAt: null,
-    },
-    {
-      $set: {
-        revokedAt: new Date(),
-      },
-    },
-  );
+  // Hard-delete secrets and connection metadata so disconnect matches
+  // "Disconnect and delete" and leaves no provider rows in MongoDB.
+  await EncryptedCredentialModel.deleteMany({
+    userId: input.userId,
+    provider: input.provider,
+  });
 
-  await ProviderConnectionModel.findOneAndUpdate(
-    {
-      userId: input.userId,
-      provider: input.provider,
-    },
-    {
-      $set: {
-        status: "disconnected",
-        lastCheckedAt: new Date(),
-        lastErrorCode: null,
-        credentialId: "",
-      },
-    },
-    {
-      returnDocument: "after",
-    },
-  );
+  await ProviderConnectionModel.deleteMany({
+    userId: input.userId,
+    provider: input.provider,
+  });
 }

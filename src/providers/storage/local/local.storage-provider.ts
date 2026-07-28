@@ -104,10 +104,11 @@ export class LocalCvStorageProvider implements CvStorageProvider {
 
   async createDownloadUrl(
     input: StoredCvRef,
-    _expiresInSeconds: number,
+    expiresInSeconds: number,
   ): Promise<string> {
     assertLocalAllowed();
     assertSafeRelativeKey(input.storageKey);
+    void expiresInSeconds;
     return `/api/resumes/download?key=${encodeURIComponent(input.storageKey)}`;
   }
 
