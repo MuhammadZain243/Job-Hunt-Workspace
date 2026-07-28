@@ -60,8 +60,7 @@ export const workspaceNavItems: NavItem[] = [
     title: "CV Library",
     href: "/cv-library",
     icon: "file-text",
-    enabled: false,
-    comingSoon: true,
+    enabled: true,
   },
   {
     title: "Settings",
@@ -72,5 +71,5 @@ export const workspaceNavItems: NavItem[] = [
 ];
 
 export const mobilePrimaryNav = workspaceNavItems.filter((item) =>
-  ["Dashboard", "Jobs", "Applications", "Settings"].includes(item.title),
+  ["Dashboard", "CV Library", "Settings"].includes(item.title),
 );

@@ -20,6 +20,7 @@ export type CvUploadIntent = {
   provider: CvStorageProviderName;
   uploadUrl?: string;
   fields?: Record<string, string>;
+  storageKey?: string;
 };
 
 export type FinalizeCvUploadInput = {
@@ -27,10 +28,18 @@ export type FinalizeCvUploadInput = {
   uploadKey: string;
 };
 
+export type UploadCvObjectInput = {
+  userId: string;
+  fileName: string;
+  contentType: string;
+  bytes: Uint8Array;
+};
+
 export type StoredCvRef = {
   userId: string;
   storageKey: string;
   storageProvider: CvStorageProviderName;
+  storageMetadata?: Record<string, string | number | boolean | null | undefined>;
 };
 
 export type StoredCvObject = {
@@ -43,8 +52,12 @@ export interface CvStorageProvider {
   readonly provider: CvStorageProviderName;
   createUploadIntent(input: CreateCvUploadInput): Promise<CvUploadIntent>;
   finalizeUpload(input: FinalizeCvUploadInput): Promise<StoredCvObject>;
+  uploadObject(input: UploadCvObjectInput): Promise<StoredCvObject>;
   getFile(input: StoredCvRef): Promise<Uint8Array>;
-  createDownloadUrl(input: StoredCvRef, expiresInSeconds: number): Promise<string>;
+  createDownloadUrl(
+    input: StoredCvRef,
+    expiresInSeconds: number,
+  ): Promise<string>;
   deleteFile(input: StoredCvRef): Promise<void>;
   testConnection(): Promise<ConnectionHealth>;
 }

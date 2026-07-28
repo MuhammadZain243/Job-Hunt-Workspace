@@ -1,0 +1,207 @@
+import type { Metadata } from "next";
+
+import { CandidateProfileEditor } from "@/components/resumes/candidate-profile-editor";
+import { CvUploadForm } from "@/components/resumes/cv-upload-form";
+import { ResumeActions } from "@/components/resumes/resume-actions";
+import { FadeIn } from "@/components/motion/fade-in";
+import { SettingsFeedbackToast } from "@/components/settings/settings-feedback-toast";
+import { EmptyState } from "@/components/states/empty-state";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { requireSessionOrRedirect } from "@/lib/auth/session";
+import { getCandidateProfileForResume } from "@/modules/candidate-profile/candidate-profile.service";
+import { listResumes } from "@/modules/resumes/resume.service";
+
+export const metadata: Metadata = {
+  title: "CV Library",
+};
+
+function getFeedback(
+  searchParams:
+    | Promise<Record<string, string | string[] | undefined>>
+    | undefined,
+): Promise<{ success?: string; error?: string }> {
+  return Promise.resolve(searchParams).then((params) => {
+    const getValue = (key: string) => {
+      const value = params?.[key];
+      return Array.isArray(value) ? value[0] : value;
+    };
+
+    const success = getValue("success");
+    const error = getValue("error");
+
+    const successMessages: Record<string, string> = {
+      uploaded: "CV uploaded. Extraction started.",
+      renamed: "CV renamed.",
+      "default-set": "Default CV updated.",
+      deleted: "CV deleted.",
+      processing: "Extraction queued.",
+      "profile-saved": "Candidate profile saved.",
+      "profile-reviewed": "Candidate profile marked as reviewed.",
+    };
+
+    const errorMessages: Record<string, string> = {
+      "missing-file": "Choose a PDF or DOCX file to upload.",
+      conflict: "This CV file was already uploaded.",
+      validation_error: "The file failed validation.",
+      "upload-failed": "Upload failed. Try again.",
+      "rename-failed": "Could not rename the CV.",
+      "default-failed": "Could not set the default CV.",
+      "delete-failed": "Could not delete the CV.",
+      "download-failed": "Could not create a download link.",
+      "process-failed": "Could not start extraction.",
+      "profile-save-failed": "Could not save the profile.",
+      "profile-review-failed": "Could not mark the profile as reviewed.",
+    };
+
+    return {
+      success: success ? (successMessages[success] ?? "Done.") : undefined,
+      error: error ? (errorMessages[error] ?? "Something went wrong.") : undefined,
+    };
+  });
+}
+
+export default async function CvLibraryPage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const { user } = await requireSessionOrRedirect();
+  const [resumes, feedback] = await Promise.all([
+    listResumes(user.id),
+    getFeedback(searchParams),
+  ]);
+
+  const profiles = await Promise.all(
+    resumes.map(async (resume) => ({
+      resumeId: resume.id,
+      profile: await getCandidateProfileForResume({
+        userId: user.id,
+        resumeId: resume.id,
+      }),
+    })),
+  );
+
+  const profileByResumeId = new Map(
+    profiles.map((entry) => [entry.resumeId, entry.profile]),
+  );
+
+  return (
+    <FadeIn className="space-y-8">
+      <SettingsFeedbackToast
+        success={feedback.success}
+        error={feedback.error}
+        clearPath="/cv-library"
+      />
+
+      <div className="space-y-2">
+        <h1 className="text-3xl font-semibold tracking-tight">CV Library</h1>
+        <p className="max-w-3xl text-sm leading-6 text-muted-foreground">
+          Upload private CV files, extract text, review candidate facts, and
+          choose a default version for outreach.
+        </p>
+      </div>
+
+      <div className="grid gap-5 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+        <Card className="rounded-2xl border-border/80 shadow-none">
+          <CardHeader>
+            <CardTitle>Upload CV</CardTitle>
+            <CardDescription>
+              Files are validated, hashed, and stored through your active
+              storage provider.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <CvUploadForm />
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-2xl border-border/80 shadow-none">
+          <CardHeader>
+            <CardTitle>Versions</CardTitle>
+            <CardDescription>
+              Rename, download, set default, delete, and review extracted
+              profiles.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {resumes.length === 0 ? (
+              <EmptyState
+                title="No CVs yet"
+                description="Upload a PDF or DOCX to create your first private CV record."
+                className="rounded-2xl border-border/80 bg-background/70 px-6 py-8 shadow-none"
+              />
+            ) : (
+              resumes.map((resume) => {
+                const profile = profileByResumeId.get(resume.id);
+
+                return (
+                  <div
+                    key={resume.id}
+                    className="space-y-4 rounded-2xl border border-border/80 bg-background/70 p-4"
+                  >
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <p className="font-medium">{resume.name}</p>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                          {resume.originalFileName} ·{" "}
+                          {(resume.sizeBytes / 1024).toFixed(1)} KB ·{" "}
+                          {resume.storageProvider}
+                        </p>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {resume.isDefault ? (
+                          <Badge className="rounded-full px-3 py-1 text-xs">
+                            Default
+                          </Badge>
+                        ) : null}
+                        <Badge
+                          variant="secondary"
+                          className="rounded-full px-3 py-1 text-xs"
+                        >
+                          {resume.extractionStatus}
+                        </Badge>
+                      </div>
+                    </div>
+
+                    {resume.extractionError ? (
+                      <p className="text-sm text-destructive">
+                        {resume.extractionError}
+                      </p>
+                    ) : null}
+
+                    <ResumeActions
+                      resumeId={resume.id}
+                      name={resume.name}
+                      isDefault={resume.isDefault}
+                      extractionStatus={resume.extractionStatus}
+                    />
+
+                    {profile ? (
+                      <CandidateProfileEditor
+                        resumeId={resume.id}
+                        profile={{
+                          headline: profile.headline,
+                          summary: profile.summary,
+                          contact: profile.contact,
+                          skills: profile.skills as Array<{ name: string }>,
+                          reviewStatus: profile.reviewStatus,
+                        }}
+                      />
+                    ) : null}
+                  </div>
+                );
+              })
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </FadeIn>
+  );
+}

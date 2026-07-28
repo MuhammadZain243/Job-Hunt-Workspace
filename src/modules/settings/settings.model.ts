@@ -40,6 +40,11 @@ const appSettingsSchema = new Schema(
       enum: cvStorageProviderValues,
       default: "local",
     },
+    defaultCvId: {
+      type: String,
+      required: false,
+      default: null,
+    },
     autoFollowUpsEnabled: {
       type: Boolean,
       required: true,
