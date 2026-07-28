@@ -35,8 +35,8 @@ export default async function LoginPage() {
                 </h1>
                 <p className="max-w-2xl text-base leading-7 text-muted-foreground">
                   Sign in to your personal workspace for applications,
-                  research, outreach drafts, and next steps. This foundation
-                  phase keeps the experience focused and owner-only.
+                  research, outreach drafts, and next steps. The experience
+                  stays focused and owner-only.
                 </p>
               </div>
             </div>
@@ -53,7 +53,7 @@ export default async function LoginPage() {
                 <Sparkles className="mb-3 size-5 text-foreground" />
                 <p className="text-sm font-medium">Focused workspace</p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Clean Phase 0 foundation
+                  Clean, calm layout
                 </p>
               </div>
               <div className="rounded-2xl border border-border/70 bg-background/80 p-4">

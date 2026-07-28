@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
@@ -92,10 +93,14 @@ export async function saveCloudinaryConnectionAction(
     });
 
     revalidatePath("/settings");
-    redirect("/settings?cloudinarySuccess=connected");
-  } catch {
+  } catch (error) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
     redirect("/settings?cloudinaryError=connection-failed");
   }
+
+  redirect("/settings?cloudinarySuccess=connected");
 }
 
 export async function disconnectCloudinaryAction(): Promise<void> {
@@ -120,8 +125,12 @@ export async function disconnectCloudinaryAction(): Promise<void> {
     });
 
     revalidatePath("/settings");
-    redirect("/settings?disconnectSuccess=cloudinary");
-  } catch {
+  } catch (error) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
     redirect("/settings?disconnectError=cloudinary");
   }
+
+  redirect("/settings?disconnectSuccess=cloudinary");
 }

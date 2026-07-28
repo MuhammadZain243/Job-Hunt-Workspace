@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import { Cloud, DatabaseZap, HardDrive, ShieldCheck } from "lucide-react";
 
 import { RequiredLabel } from "@/components/forms/required-label";
+import { PendingSubmitButton } from "@/components/forms/pending-submit-button";
 import { FadeIn } from "@/components/motion/fade-in";
 import { DisconnectCloudinaryButton } from "@/components/settings/disconnect-cloudinary-button";
 import { SettingsFeedbackToast } from "@/components/settings/settings-feedback-toast";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -147,11 +147,11 @@ export default async function SettingsPage({
 
       <div className="space-y-2">
         <h1 className="text-3xl font-semibold tracking-tight">Settings</h1>
-        <p className="max-w-3xl text-sm leading-6 text-muted-foreground">
-          Phase 1 starts with CV storage controls. Choose an active storage
-          provider, connect Cloudinary securely, and verify the local
-          development path.
-        </p>
+            <p className="max-w-3xl text-sm leading-6 text-muted-foreground">
+              Manage CV storage controls. Choose an active storage provider,
+              connect Cloudinary securely, and verify the local development
+              path.
+            </p>
       </div>
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
@@ -161,7 +161,7 @@ export default async function SettingsPage({
               <div>
                 <CardTitle>Storage provider</CardTitle>
                 <CardDescription>
-                  Select where private CV files will live in Phase 1.
+                  Select where private CV files will be stored.
                 </CardDescription>
               </div>
               <Badge
@@ -198,9 +198,10 @@ export default async function SettingsPage({
                 />
               </div>
 
-              <Button type="submit" className="rounded-xl">
-                Save active provider
-              </Button>
+              <PendingSubmitButton
+                idleLabel="Save active provider"
+                pendingLabel="Saving…"
+              />
             </form>
 
             <div className="rounded-2xl border border-border/80 bg-muted/25 p-4">
@@ -261,7 +262,7 @@ export default async function SettingsPage({
                     required
                     aria-required="true"
                     placeholder="your-cloud-name"
-                    className="h-11 rounded-xl"
+                    className="h-10 rounded-xl"
                   />
                 </div>
                 <div className="space-y-2">
@@ -274,7 +275,7 @@ export default async function SettingsPage({
                     required
                     aria-required="true"
                     placeholder="Cloudinary API key"
-                    className="h-11 rounded-xl"
+                    className="h-10 rounded-xl"
                   />
                 </div>
                 <div className="space-y-2">
@@ -288,14 +289,17 @@ export default async function SettingsPage({
                     required
                     aria-required="true"
                     placeholder="Cloudinary API secret"
-                    className="h-11 rounded-xl"
+                    className="h-10 rounded-xl"
                   />
                 </div>
-                <Button type="submit" className="rounded-xl">
-                  {isCloudinaryConnected
-                    ? "Update and test Cloudinary"
-                    : "Save and test Cloudinary"}
-                </Button>
+                <PendingSubmitButton
+                  idleLabel={
+                    isCloudinaryConnected
+                      ? "Update and test Cloudinary"
+                      : "Save and test Cloudinary"
+                  }
+                  pendingLabel="Testing connection…"
+                />
               </form>
             </CardContent>
           </Card>
@@ -309,13 +313,11 @@ export default async function SettingsPage({
             </CardHeader>
             <CardContent className="space-y-4">
               <form action={testLocalStorageAction}>
-                <Button
-                  type="submit"
+                <PendingSubmitButton
                   variant="outline"
-                  className="rounded-xl"
-                >
-                  Test local storage
-                </Button>
+                  idleLabel="Test local storage"
+                  pendingLabel="Testing…"
+                />
               </form>
             </CardContent>
           </Card>
