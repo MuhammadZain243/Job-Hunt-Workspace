@@ -41,4 +41,5 @@ adr/
 backlog/
 config/
 docs/
-prompts/
+# Root-only planning prompts; app prompt templates live in src/prompts/
+/prompts/
