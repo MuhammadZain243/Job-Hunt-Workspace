@@ -57,6 +57,16 @@ export async function upsertCandidateProfileFromExtraction(input: {
 }) {
   await connectMongoose();
 
+  const existing = await CandidateProfileModel.findOne({
+    userId: input.userId,
+    resumeId: input.resumeId,
+  }).lean();
+
+  // Reviewed profiles keep owner corrections; re-extraction only refreshes CV text.
+  if (existing?.reviewStatus === "reviewed") {
+    return mapProfile(existing);
+  }
+
   const profile = await CandidateProfileModel.findOneAndUpdate(
     { userId: input.userId, resumeId: input.resumeId },
     {
@@ -75,6 +85,17 @@ export async function upsertCandidateProfileFromExtraction(input: {
   ).lean();
 
   return mapProfile(profile);
+}
+
+export async function deleteCandidateProfileForResume(input: {
+  userId: string;
+  resumeId: string;
+}) {
+  await connectMongoose();
+  await CandidateProfileModel.deleteOne({
+    userId: input.userId,
+    resumeId: input.resumeId,
+  });
 }
 
 export async function getCandidateProfileForResume(input: {
@@ -102,9 +123,19 @@ export async function updateCandidateProfileDraft(input: {
   contactEmail: string;
   contactPhone: string;
   contactLocation: string;
+  contactLinkedinUrl: string;
   skillsCsv: string;
 }) {
   await connectMongoose();
+
+  const existing = await CandidateProfileModel.findOne({
+    userId: input.userId,
+    resumeId: input.resumeId,
+  }).lean();
+
+  if (!existing) {
+    throw new NotFoundError("Candidate profile not found");
+  }
 
   const skills = input.skillsCsv
     .split(",")
@@ -129,9 +160,17 @@ export async function updateCandidateProfileDraft(input: {
           email: input.contactEmail.trim(),
           phone: input.contactPhone.trim(),
           location: input.contactLocation.trim(),
-          linkedinUrl: "",
+          linkedinUrl:
+            input.contactLinkedinUrl.trim() ||
+            existing.contact?.linkedinUrl ||
+            "",
         },
         skills,
+        // Keep structured sections from extraction; editable in a later pass.
+        experience: existing.experience ?? [],
+        education: existing.education ?? [],
+        projects: existing.projects ?? [],
+        achievements: existing.achievements ?? [],
         reviewStatus: "draft",
       },
     },

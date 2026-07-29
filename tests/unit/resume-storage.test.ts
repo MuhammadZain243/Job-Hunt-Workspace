@@ -56,4 +56,37 @@ describe("buildDraftCandidateProfile", () => {
     );
     expect(draft.skills[0]?.evidence.source).toBe("cv_text");
   });
+
+  it("extracts experience education projects and achievements", () => {
+    const draft = buildDraftCandidateProfile(`
+Jane Doe
+jane@example.com
+https://linkedin.com/in/janedoe
+
+Summary
+Senior engineer focused on product delivery.
+
+Experience
+Software Engineer | Acme Corp | Jan 2022 - Present
+- Built resume workflows
+- Improved extraction reliability
+
+Education
+State University | BSc | Computer Science
+
+Projects
+Job Hunt Workspace
+- Private CV library with evidence-backed profiles
+
+Achievements
+- Reduced onboarding time by half
+`);
+
+    expect(draft.experience[0]?.company).toContain("Acme");
+    expect(draft.experience[0]?.evidence.source).toBe("cv_text");
+    expect(draft.education[0]?.school).toContain("State University");
+    expect(draft.projects[0]?.name).toContain("Job Hunt Workspace");
+    expect(draft.achievements[0]?.text).toMatch(/onboarding/i);
+    expect(draft.contact.linkedinUrl).toMatch(/linkedin\.com\/in\/janedoe/i);
+  });
 });

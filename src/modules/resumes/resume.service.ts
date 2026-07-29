@@ -8,7 +8,10 @@ import {
 } from "@/lib/errors/app-error";
 import { recordAuditEvent } from "@/modules/audit/audit.service";
 import { buildDraftCandidateProfile } from "@/modules/candidate-profile/candidate-profile.parser";
-import { upsertCandidateProfileFromExtraction } from "@/modules/candidate-profile/candidate-profile.service";
+import {
+  deleteCandidateProfileForResume,
+  upsertCandidateProfileFromExtraction,
+} from "@/modules/candidate-profile/candidate-profile.service";
 import { extractTextFromCv } from "@/modules/resumes/resume.extraction";
 import { ResumeModel } from "@/modules/resumes/resume.model";
 import { validateCvBytes } from "@/modules/resumes/resume.validation";
@@ -266,6 +269,10 @@ export async function deleteResume(input: {
   }
 
   await ResumeModel.deleteOne({ _id: input.resumeId, userId: input.userId });
+  await deleteCandidateProfileForResume({
+    userId: input.userId,
+    resumeId: input.resumeId,
+  });
 
   if (resume.isDefault) {
     const next = await ResumeModel.findOne({ userId: input.userId })

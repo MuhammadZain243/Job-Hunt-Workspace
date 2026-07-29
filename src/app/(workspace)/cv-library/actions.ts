@@ -163,6 +163,7 @@ export async function saveCandidateProfileAction(
       contactEmail: String(formData.get("contactEmail") ?? ""),
       contactPhone: String(formData.get("contactPhone") ?? ""),
       contactLocation: String(formData.get("contactLocation") ?? ""),
+      contactLinkedinUrl: String(formData.get("contactLinkedinUrl") ?? ""),
       skillsCsv: String(formData.get("skillsCsv") ?? ""),
     });
     revalidatePath("/cv-library");

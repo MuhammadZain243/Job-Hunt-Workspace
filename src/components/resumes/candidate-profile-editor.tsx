@@ -12,6 +12,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+type Evidence = {
+  source: string;
+  excerpt?: string;
+};
+
 type CandidateProfileEditorProps = {
   resumeId: string;
   profile: {
@@ -21,11 +26,47 @@ type CandidateProfileEditorProps = {
       email: string;
       phone: string;
       location: string;
+      linkedinUrl: string;
     };
-    skills: Array<{ name: string }>;
+    skills: Array<{ name: string; evidence?: Evidence }>;
+    experience: Array<{
+      title: string;
+      company: string;
+      startDate?: string;
+      endDate?: string;
+      bullets?: string[];
+      evidence?: Evidence;
+    }>;
+    education: Array<{
+      school: string;
+      degree: string;
+      field?: string;
+      evidence?: Evidence;
+    }>;
+    projects: Array<{
+      name: string;
+      description?: string;
+      evidence?: Evidence;
+    }>;
+    achievements: Array<{
+      text: string;
+      evidence?: Evidence;
+    }>;
     reviewStatus: "draft" | "reviewed";
   };
 };
+
+function EvidenceNote({ evidence }: { evidence?: Evidence }) {
+  if (!evidence?.excerpt) {
+    return null;
+  }
+
+  return (
+    <p className="mt-1 text-xs leading-5 text-muted-foreground">
+      Evidence ({evidence.source}): {evidence.excerpt}
+    </p>
+  );
+}
 
 export function CandidateProfileEditor({
   resumeId,
@@ -75,7 +116,7 @@ export function CandidateProfileEditor({
           />
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2">
           <div className="space-y-2">
             <RequiredLabel htmlFor={`email-${resumeId}`}>Email</RequiredLabel>
             <Input
@@ -104,6 +145,18 @@ export function CandidateProfileEditor({
               id={`location-${resumeId}`}
               name="contactLocation"
               defaultValue={profile.contact.location}
+              className="h-10 rounded-xl"
+              disabled={pending}
+            />
+          </div>
+          <div className="space-y-2">
+            <RequiredLabel htmlFor={`linkedin-${resumeId}`}>
+              LinkedIn URL
+            </RequiredLabel>
+            <Input
+              id={`linkedin-${resumeId}`}
+              name="contactLinkedinUrl"
+              defaultValue={profile.contact.linkedinUrl}
               className="h-10 rounded-xl"
               disabled={pending}
             />
@@ -140,6 +193,95 @@ export function CandidateProfileEditor({
           </Button>
         </div>
       </form>
+
+      {profile.experience.length > 0 ? (
+        <section className="space-y-2">
+          <p className="text-sm font-medium">Experience</p>
+          <ul className="space-y-3">
+            {profile.experience.map((item, index) => (
+              <li
+                key={`${item.title}-${item.company}-${index}`}
+                className="rounded-xl border border-border/70 bg-background/70 p-3 text-sm"
+              >
+                <p className="font-medium">
+                  {item.title}
+                  {item.company ? ` · ${item.company}` : ""}
+                </p>
+                {item.startDate || item.endDate ? (
+                  <p className="text-xs text-muted-foreground">
+                    {[item.startDate, item.endDate].filter(Boolean).join(" – ")}
+                  </p>
+                ) : null}
+                {item.bullets && item.bullets.length > 0 ? (
+                  <ul className="mt-2 list-disc space-y-1 pl-4 text-muted-foreground">
+                    {item.bullets.map((bullet) => (
+                      <li key={bullet}>{bullet}</li>
+                    ))}
+                  </ul>
+                ) : null}
+                <EvidenceNote evidence={item.evidence} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {profile.education.length > 0 ? (
+        <section className="space-y-2">
+          <p className="text-sm font-medium">Education</p>
+          <ul className="space-y-3">
+            {profile.education.map((item, index) => (
+              <li
+                key={`${item.school}-${index}`}
+                className="rounded-xl border border-border/70 bg-background/70 p-3 text-sm"
+              >
+                <p className="font-medium">{item.school}</p>
+                <p className="text-muted-foreground">
+                  {[item.degree, item.field].filter(Boolean).join(" · ")}
+                </p>
+                <EvidenceNote evidence={item.evidence} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {profile.projects.length > 0 ? (
+        <section className="space-y-2">
+          <p className="text-sm font-medium">Projects</p>
+          <ul className="space-y-3">
+            {profile.projects.map((item, index) => (
+              <li
+                key={`${item.name}-${index}`}
+                className="rounded-xl border border-border/70 bg-background/70 p-3 text-sm"
+              >
+                <p className="font-medium">{item.name}</p>
+                {item.description ? (
+                  <p className="text-muted-foreground">{item.description}</p>
+                ) : null}
+                <EvidenceNote evidence={item.evidence} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {profile.achievements.length > 0 ? (
+        <section className="space-y-2">
+          <p className="text-sm font-medium">Achievements</p>
+          <ul className="space-y-3">
+            {profile.achievements.map((item, index) => (
+              <li
+                key={`${item.text}-${index}`}
+                className="rounded-xl border border-border/70 bg-background/70 p-3 text-sm"
+              >
+                <p>{item.text}</p>
+                <EvidenceNote evidence={item.evidence} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       {profile.reviewStatus !== "reviewed" ? (
         <form

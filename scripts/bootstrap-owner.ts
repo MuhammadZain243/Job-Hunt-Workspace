@@ -35,7 +35,7 @@ async function main() {
 
   if (!email || !password) {
     throw new Error(
-      'Usage: pnpm bootstrap:owner -- --email "you@example.com" --password "at-least-12-chars" [--name "Your Name"]',
+      'Usage: pnpm bootstrap:owner -- --email "you@example.com" --password "at-least-8-chars" [--name "Your Name"]',
     );
   }
 

@@ -250,6 +250,17 @@ export default async function SettingsPage({
               />
             </form>
 
+            {settings.resumeCount > 0 ? (
+              <div className="rounded-2xl border border-border/80 bg-muted/25 p-4">
+                <p className="text-sm leading-6 text-muted-foreground">
+                  You already have {settings.resumeCount} CV
+                  {settings.resumeCount === 1 ? "" : "s"} stored. Changing the
+                  active provider affects new uploads only. Existing files keep
+                  their original provider until you re-upload or migrate them.
+                </p>
+              </div>
+            ) : null}
+
             <div className="rounded-2xl border border-border/80 bg-muted/25 p-4">
               <div className="flex items-start gap-3">
                 <ShieldCheck className="mt-0.5 size-4 text-foreground" />

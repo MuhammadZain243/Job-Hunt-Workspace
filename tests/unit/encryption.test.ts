@@ -95,6 +95,23 @@ describe("encryption service", () => {
     ).toThrow();
   });
 
+  it("fails when provider AAD does not match", () => {
+    setEnv();
+    const payload = encryptSecret("secret", {
+      userId: "user_1",
+      provider: "cloudinary",
+      credentialId: "cred_1",
+    });
+
+    expect(() =>
+      decryptSecret(payload, {
+        userId: "user_1",
+        provider: "s3",
+        credentialId: "cred_1",
+      }),
+    ).toThrow();
+  });
+
   it("creates a stable short fingerprint", () => {
     setEnv();
     expect(fingerprintSecret("abc")).toHaveLength(8);

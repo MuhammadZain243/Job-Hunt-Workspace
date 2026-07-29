@@ -223,7 +223,33 @@ export default async function CvLibraryPage({
                         headline: profile.headline,
                         summary: profile.summary,
                         contact: profile.contact,
-                        skills: profile.skills as Array<{ name: string }>,
+                        skills: profile.skills as Array<{
+                          name: string;
+                          evidence?: { source: string; excerpt?: string };
+                        }>,
+                        experience: (profile.experience ?? []) as Array<{
+                          title: string;
+                          company: string;
+                          startDate?: string;
+                          endDate?: string;
+                          bullets?: string[];
+                          evidence?: { source: string; excerpt?: string };
+                        }>,
+                        education: (profile.education ?? []) as Array<{
+                          school: string;
+                          degree: string;
+                          field?: string;
+                          evidence?: { source: string; excerpt?: string };
+                        }>,
+                        projects: (profile.projects ?? []) as Array<{
+                          name: string;
+                          description?: string;
+                          evidence?: { source: string; excerpt?: string };
+                        }>,
+                        achievements: (profile.achievements ?? []) as Array<{
+                          text: string;
+                          evidence?: { source: string; excerpt?: string };
+                        }>,
                         reviewStatus: profile.reviewStatus,
                       }}
                     />

@@ -7,6 +7,7 @@ import {
   ValidationError,
 } from "@/lib/errors/app-error";
 import { listProviderConnections } from "@/modules/credentials/credential.service";
+import { ResumeModel } from "@/modules/resumes/resume.model";
 import { AppSettingsModel } from "@/modules/settings/settings.model";
 import type { CvStorageProviderName } from "@/providers/storage/storage.types";
 
@@ -55,9 +56,11 @@ export async function updateCvStorageProvider(
 }
 
 export async function getStorageSettingsView(userId: string) {
-  const [settings, connections] = await Promise.all([
+  await connectMongoose();
+  const [settings, connections, resumeCount] = await Promise.all([
     getOrCreateAppSettings(userId),
     listProviderConnections(userId),
+    ResumeModel.countDocuments({ userId }),
   ]);
 
   return {
@@ -65,5 +68,6 @@ export async function getStorageSettingsView(userId: string) {
     defaultCvId: settings.defaultCvId ?? null,
     isProduction: getServerEnv().NODE_ENV === "production",
     connections,
+    resumeCount,
   };
 }

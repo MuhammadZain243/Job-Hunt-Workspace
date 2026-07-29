@@ -50,7 +50,10 @@ function isSensitiveKey(key: string): boolean {
   );
 }
 
-function sanitizeMetadata(metadata: AuditMetadata | undefined): AuditMetadata {
+/** Exported for unit tests; also used by recordAuditEvent. */
+export function sanitizeAuditMetadata(
+  metadata: AuditMetadata | undefined,
+): AuditMetadata {
   if (!metadata) {
     return {};
   }
@@ -90,7 +93,7 @@ export async function recordAuditEvent(
 ): Promise<AuditEventDocument> {
   await connectMongoose();
 
-  const metadata = sanitizeMetadata(input.metadata);
+  const metadata = sanitizeAuditMetadata(input.metadata);
   const createdAt = new Date();
 
   const doc = await AuditEventModel.create({
