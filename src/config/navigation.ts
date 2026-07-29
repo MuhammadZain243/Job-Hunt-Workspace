@@ -18,29 +18,25 @@ export const workspaceNavItems: NavItem[] = [
     title: "Companies",
     href: "/companies",
     icon: "building-2",
-    enabled: false,
-    comingSoon: true,
+    enabled: true,
   },
   {
     title: "Jobs",
     href: "/jobs",
     icon: "briefcase",
-    enabled: false,
-    comingSoon: true,
+    enabled: true,
   },
   {
     title: "Applications",
     href: "/applications",
     icon: "kanban",
-    enabled: false,
-    comingSoon: true,
+    enabled: true,
   },
   {
     title: "Contacts",
     href: "/contacts",
     icon: "users",
-    enabled: false,
-    comingSoon: true,
+    enabled: true,
   },
   {
     title: "Email Sequences",
@@ -64,5 +60,5 @@ export const workspaceNavItems: NavItem[] = [
 ];
 
 export const mobilePrimaryNav = workspaceNavItems.filter((item) =>
-  ["Dashboard", "CV Library", "Settings"].includes(item.title),
+  ["Dashboard", "Jobs", "CV Library", "Settings"].includes(item.title),
 );
