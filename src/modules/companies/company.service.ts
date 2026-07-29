@@ -2,6 +2,7 @@ import "server-only";
 
 import { connectMongoose } from "@/lib/db/mongoose";
 import { ConflictError, NotFoundError } from "@/lib/errors/app-error";
+import { ApplicationModel } from "@/modules/applications/application.model";
 import { recordAuditEvent } from "@/modules/audit/audit.service";
 import { CompanyModel } from "@/modules/companies/company.model";
 import {
@@ -10,6 +11,8 @@ import {
   normalizeDomain,
   updateCompanySchema,
 } from "@/modules/companies/company.validation";
+import { ContactModel } from "@/modules/contacts/contact.model";
+import { JobModel } from "@/modules/jobs/job.model";
 import type { SourceRef } from "@/modules/shared/source.types";
 
 function mapCompany(doc: {
@@ -182,18 +185,67 @@ export async function updateCompany(userId: string, input: unknown) {
 
 export async function deleteCompany(userId: string, companyId: string) {
   await connectMongoose();
-  const result = await CompanyModel.deleteOne({ _id: companyId, userId });
-  if (result.deletedCount === 0) {
+  const existing = await CompanyModel.findOne({
+    _id: companyId,
+    userId,
+  }).lean();
+  if (!existing) {
     throw new NotFoundError("Company not found");
   }
+
+  const [contacts, jobs, applications] = await Promise.all([
+    ContactModel.deleteMany({ userId, companyId }),
+    JobModel.deleteMany({ userId, companyId }),
+    ApplicationModel.deleteMany({ userId, companyId }),
+  ]);
+
+  await CompanyModel.deleteOne({ _id: companyId, userId });
 
   await recordAuditEvent({
     userId,
     action: "company.deleted",
     entityType: "company",
     entityId: companyId,
-    metadata: {},
+    metadata: {
+      contactsDeleted: contacts.deletedCount ?? 0,
+      jobsDeleted: jobs.deletedCount ?? 0,
+      applicationsDeleted: applications.deletedCount ?? 0,
+    },
   });
+}
+
+export async function listCompaniesWithStats(userId: string) {
+  await connectMongoose();
+  const companies = await listCompanies(userId);
+  const [jobCounts, contactCounts, applicationCounts] = await Promise.all([
+    JobModel.aggregate<{ _id: string; count: number }>([
+      { $match: { userId } },
+      { $group: { _id: "$companyId", count: { $sum: 1 } } },
+    ]),
+    ContactModel.aggregate<{ _id: string; count: number }>([
+      { $match: { userId } },
+      { $group: { _id: "$companyId", count: { $sum: 1 } } },
+    ]),
+    ApplicationModel.aggregate<{ _id: string; count: number }>([
+      { $match: { userId } },
+      { $group: { _id: "$companyId", count: { $sum: 1 } } },
+    ]),
+  ]);
+
+  const jobsByCompany = new Map(jobCounts.map((row) => [row._id, row.count]));
+  const contactsByCompany = new Map(
+    contactCounts.map((row) => [row._id, row.count]),
+  );
+  const applicationsByCompany = new Map(
+    applicationCounts.map((row) => [row._id, row.count]),
+  );
+
+  return companies.map((company) => ({
+    ...company,
+    jobCount: jobsByCompany.get(company.id) ?? 0,
+    contactCount: contactsByCompany.get(company.id) ?? 0,
+    applicationCount: applicationsByCompany.get(company.id) ?? 0,
+  }));
 }
 
 export async function countCompanies(userId: string) {

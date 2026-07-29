@@ -106,6 +106,10 @@ export default async function JobDetailPage({
             .filter(Boolean)
             .join(" · ") || "Review extracted details below"}
         </p>
+        <p className="text-muted-foreground mt-1 text-xs">
+          Source freshness: updated {job.updatedAt.toISOString().slice(0, 10)}
+          {job.sourceUrl ? " · URL captured" : " · pasted text only"}
+        </p>
       </div>
 
       {job.extractionWarnings.length > 0 ? (
@@ -217,6 +221,42 @@ export default async function JobDetailPage({
                 name="applicationUrl"
                 defaultValue={job.applicationUrl}
                 className="h-10 rounded-xl"
+              />
+            </div>
+            <div className="space-y-2 sm:col-span-2">
+              <RequiredLabel htmlFor="requirementsText">
+                Requirements (one per line)
+              </RequiredLabel>
+              <textarea
+                id="requirementsText"
+                name="requirementsText"
+                rows={5}
+                defaultValue={job.requirements.join("\n")}
+                className="border-input bg-background focus-visible:ring-ring flex w-full rounded-xl border px-3 py-2 text-sm outline-none focus-visible:ring-2"
+              />
+            </div>
+            <div className="space-y-2 sm:col-span-2">
+              <RequiredLabel htmlFor="responsibilitiesText">
+                Responsibilities (one per line)
+              </RequiredLabel>
+              <textarea
+                id="responsibilitiesText"
+                name="responsibilitiesText"
+                rows={5}
+                defaultValue={job.responsibilities.join("\n")}
+                className="border-input bg-background focus-visible:ring-ring flex w-full rounded-xl border px-3 py-2 text-sm outline-none focus-visible:ring-2"
+              />
+            </div>
+            <div className="space-y-2 sm:col-span-2">
+              <RequiredLabel htmlFor="skillsText">
+                Skills (comma separated)
+              </RequiredLabel>
+              <textarea
+                id="skillsText"
+                name="skillsText"
+                rows={3}
+                defaultValue={job.skills.join(", ")}
+                className="border-input bg-background focus-visible:ring-ring flex w-full rounded-xl border px-3 py-2 text-sm outline-none focus-visible:ring-2"
               />
             </div>
             <div className="sm:col-span-2">

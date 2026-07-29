@@ -43,7 +43,9 @@ function getFeedback(
             ? "Contact deleted."
             : success === "contact-created"
               ? "Contact created."
-              : undefined,
+              : success === "contact-updated"
+                ? "Contact updated."
+                : undefined,
       error: error ? "Could not update the contact." : undefined,
     };
   });

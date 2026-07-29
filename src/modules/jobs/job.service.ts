@@ -7,10 +7,13 @@ import { getCompany } from "@/modules/companies/company.service";
 import { extractJobDraftFromText } from "@/modules/jobs/job.extraction";
 import { JobModel } from "@/modules/jobs/job.model";
 import {
+  csvFromTextarea,
   importJobSchema,
+  linesFromTextarea,
   selectJobRoleSchema,
   updateJobReviewSchema,
 } from "@/modules/jobs/job.validation";
+import { ApplicationModel } from "@/modules/applications/application.model";
 import { createManualSourceDocument } from "@/modules/sources/source-document.service";
 
 function mapJob(doc: {
@@ -208,6 +211,9 @@ export async function updateJobReview(userId: string, input: unknown) {
         workplaceType: parsed.workplaceType?.trim() ?? "",
         employmentType: parsed.employmentType?.trim() ?? "",
         applicationUrl: parsed.applicationUrl?.trim() ?? "",
+        requirements: linesFromTextarea(parsed.requirementsText),
+        responsibilities: linesFromTextarea(parsed.responsibilitiesText),
+        skills: csvFromTextarea(parsed.skillsText),
       },
     },
     { returnDocument: "after" },
@@ -243,16 +249,22 @@ export async function requireSelectedTargetRole(
 
 export async function deleteJob(userId: string, jobId: string) {
   await connectMongoose();
-  const result = await JobModel.deleteOne({ _id: jobId, userId });
-  if (result.deletedCount === 0) {
+  const job = await JobModel.findOne({ _id: jobId, userId }).lean();
+  if (!job) {
     throw new NotFoundError("Job not found");
   }
+
+  const applications = await ApplicationModel.deleteMany({ userId, jobId });
+  await JobModel.deleteOne({ _id: jobId, userId });
+
   await recordAuditEvent({
     userId,
     action: "job.deleted",
     entityType: "job",
     entityId: jobId,
-    metadata: {},
+    metadata: {
+      applicationsDeleted: applications.deletedCount ?? 0,
+    },
   });
 }
 

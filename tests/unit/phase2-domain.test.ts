@@ -12,6 +12,10 @@ import {
   extractJobDraftFromText,
   sanitizeJobSourceText,
 } from "@/modules/jobs/job.extraction";
+import {
+  csvFromTextarea,
+  linesFromTextarea,
+} from "@/modules/jobs/job.validation";
 
 describe("company normalization", () => {
   it("normalizes names for duplicate detection", () => {
@@ -48,6 +52,15 @@ Requirements
     );
     expect(result.strippedInjection).toBe(true);
     expect(result.text).not.toMatch(/Ignore previous instructions/i);
+  });
+
+  it("parses review textareas into lists", () => {
+    expect(linesFromTextarea("• One\nTwo\n\n")).toEqual(["One", "Two"]);
+    expect(csvFromTextarea("TypeScript, React; Node")).toEqual([
+      "TypeScript",
+      "React",
+      "Node",
+    ]);
   });
 });
 

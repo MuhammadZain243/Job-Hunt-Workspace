@@ -63,6 +63,9 @@ export async function updateJobReviewAction(formData: FormData): Promise<void> {
       workplaceType: String(formData.get("workplaceType") ?? ""),
       employmentType: String(formData.get("employmentType") ?? ""),
       applicationUrl: String(formData.get("applicationUrl") ?? ""),
+      requirementsText: String(formData.get("requirementsText") ?? ""),
+      responsibilitiesText: String(formData.get("responsibilitiesText") ?? ""),
+      skillsText: String(formData.get("skillsText") ?? ""),
     });
     revalidatePath(`/jobs/${jobId}`);
     feedback(`/jobs/${jobId}`, "success=reviewed");

@@ -14,3 +14,9 @@ export const createContactSchema = z.object({
     .enum(["unknown", "inferred", "verified", "bounced"])
     .default("unknown"),
 });
+
+export const updateContactSchema = createContactSchema
+  .omit({ companyId: true, sourceType: true, sourceUrl: true })
+  .extend({
+    contactId: z.string().min(1),
+  });

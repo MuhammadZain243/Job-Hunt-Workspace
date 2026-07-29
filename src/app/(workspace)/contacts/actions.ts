@@ -9,6 +9,7 @@ import {
   createContact,
   deleteContact,
   suppressContact,
+  updateContact,
 } from "@/modules/contacts/contact.service";
 
 function feedback(path: string, params: string): never {
@@ -41,6 +42,33 @@ export async function createContactAction(formData: FormData): Promise<void> {
   } catch (error) {
     if (isRedirectError(error)) throw error;
     feedback(returnTo, "error=contact-create-failed");
+  }
+}
+
+export async function updateContactAction(formData: FormData): Promise<void> {
+  const { user } = await requireSession();
+  const companyId = String(formData.get("companyId") ?? "");
+  const returnTo = String(
+    formData.get("returnTo") ?? `/companies/${companyId}`,
+  );
+
+  try {
+    await updateContact(user.id, {
+      contactId: String(formData.get("contactId") ?? ""),
+      fullName: String(formData.get("fullName") ?? ""),
+      title: String(formData.get("title") ?? ""),
+      department: String(formData.get("department") ?? ""),
+      email: String(formData.get("email") ?? ""),
+      linkedinUrl: String(formData.get("linkedinUrl") ?? ""),
+      confidence: Number(formData.get("confidence") ?? 0.8),
+      emailStatus: String(formData.get("emailStatus") ?? "unknown"),
+    });
+    revalidatePath("/contacts");
+    revalidatePath(`/companies/${companyId}`);
+    feedback(returnTo, "success=contact-updated");
+  } catch (error) {
+    if (isRedirectError(error)) throw error;
+    feedback(returnTo, "error=contact-update-failed");
   }
 }
 

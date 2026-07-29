@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
 import { createCompanyAction } from "@/app/(workspace)/companies/actions";
+import { CompanySearchList } from "@/components/companies/company-search-list";
 import { PendingSubmitButton } from "@/components/forms/pending-submit-button";
 import { RequiredLabel } from "@/components/forms/required-label";
 import { FadeIn } from "@/components/motion/fade-in";
 import { SettingsFeedbackToast } from "@/components/settings/settings-feedback-toast";
-import { EmptyState } from "@/components/states/empty-state";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -17,7 +16,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { requireSessionOrRedirect } from "@/lib/auth/session";
-import { listCompanies } from "@/modules/companies/company.service";
+import { listCompaniesWithStats } from "@/modules/companies/company.service";
 
 export const metadata: Metadata = {
   title: "Companies",
@@ -59,7 +58,7 @@ export default async function CompaniesPage({
 }) {
   const { user } = await requireSessionOrRedirect();
   const [companies, feedback] = await Promise.all([
-    listCompanies(user.id),
+    listCompaniesWithStats(user.id),
     getFeedback(searchParams),
   ]);
 
@@ -173,38 +172,8 @@ export default async function CompaniesPage({
             {companies.length} total
           </Badge>
         </CardHeader>
-        <CardContent className="space-y-3">
-          {companies.length === 0 ? (
-            <EmptyState
-              title="No companies yet"
-              description="Create a company first, then import jobs and contacts against it."
-            />
-          ) : (
-            companies.map((company) => (
-              <Link
-                key={company.id}
-                href={`/companies/${company.id}`}
-                className="border-border/80 bg-background/70 hover:bg-muted/30 block rounded-2xl border p-4 transition-colors"
-              >
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <p className="font-medium">{company.name}</p>
-                    <p className="text-muted-foreground mt-1 text-sm">
-                      {[company.domain, company.industry]
-                        .filter(Boolean)
-                        .join(" · ") || "No domain yet"}
-                    </p>
-                  </div>
-                  <Badge
-                    variant="secondary"
-                    className="rounded-full px-3 py-1 text-xs"
-                  >
-                    {company.verificationStatus}
-                  </Badge>
-                </div>
-              </Link>
-            ))
-          )}
+        <CardContent>
+          <CompanySearchList companies={companies} />
         </CardContent>
       </Card>
     </FadeIn>

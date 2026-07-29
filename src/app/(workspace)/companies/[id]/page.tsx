@@ -5,7 +5,13 @@ import {
   deleteCompanyAction,
   updateCompanyAction,
 } from "@/app/(workspace)/companies/actions";
-import { createContactAction } from "@/app/(workspace)/contacts/actions";
+import {
+  createContactAction,
+  deleteContactAction,
+  suppressContactAction,
+  updateContactAction,
+} from "@/app/(workspace)/contacts/actions";
+import { CompanyDetailTabs } from "@/components/companies/company-detail-tabs";
 import { PendingSubmitButton } from "@/components/forms/pending-submit-button";
 import { RequiredLabel } from "@/components/forms/required-label";
 import { FadeIn } from "@/components/motion/fade-in";
@@ -44,15 +50,20 @@ function getFeedback(
       created: "Company ready.",
       updated: "Company updated.",
       "contact-created": "Contact added.",
+      "contact-updated": "Contact updated.",
+      "contact-suppressed": "Contact suppressed.",
+      "contact-deleted": "Contact deleted.",
     };
     const errors: Record<string, string> = {
       duplicate: "A company with this name or domain already exists.",
       "contact-create-failed": "Could not create the contact.",
+      "contact-update-failed": "Could not update the contact.",
       "update-failed": "Could not update the company.",
     };
     return {
       success: success ? (messages[success] ?? "Done.") : undefined,
       error: error ? (errors[error] ?? "Something went wrong.") : undefined,
+      tab: value("tab") === "contacts" ? "contacts" : "jobs",
     };
   });
 }
@@ -73,12 +84,14 @@ export default async function CompanyDetailPage({
     getFeedback(searchParams),
   ]);
 
+  const activeTab = feedback.tab as "jobs" | "contacts";
+
   return (
     <FadeIn className="space-y-6">
       <SettingsFeedbackToast
         success={feedback.success}
         error={feedback.error}
-        clearPath={`/companies/${id}`}
+        clearPath={`/companies/${id}?tab=${activeTab}`}
       />
 
       <div className="flex flex-wrap items-end justify-between gap-3">
@@ -104,7 +117,8 @@ export default async function CompanyDetailPage({
         <CardHeader>
           <CardTitle>Company details</CardTitle>
           <CardDescription>
-            Source provenance is retained on create. Edits stay owner-reviewed.
+            Deleting a company also removes its jobs, contacts, and
+            applications.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -192,7 +206,14 @@ export default async function CompanyDetailPage({
         </CardContent>
       </Card>
 
-      <div className="grid gap-6 xl:grid-cols-2">
+      <CompanyDetailTabs
+        companyId={company.id}
+        activeTab={activeTab}
+        jobCount={jobs.length}
+        contactCount={contacts.length}
+      />
+
+      {activeTab === "jobs" ? (
         <Card className="border-border/80 rounded-2xl shadow-none">
           <CardHeader>
             <CardTitle>Jobs</CardTitle>
@@ -225,12 +246,15 @@ export default async function CompanyDetailPage({
                       ? `Target: ${job.selectedRoleTitle}`
                       : "Target role not selected"}
                   </p>
+                  <p className="text-muted-foreground mt-1 text-xs">
+                    Updated {job.updatedAt.toISOString().slice(0, 10)}
+                  </p>
                 </Link>
               ))
             )}
           </CardContent>
         </Card>
-
+      ) : (
         <Card className="border-border/80 rounded-2xl shadow-none">
           <CardHeader>
             <CardTitle>Contacts</CardTitle>
@@ -244,7 +268,7 @@ export default async function CompanyDetailPage({
               <input
                 type="hidden"
                 name="returnTo"
-                value={`/companies/${company.id}`}
+                value={`/companies/${company.id}?tab=contacts`}
               />
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-2 sm:col-span-2">
@@ -263,6 +287,14 @@ export default async function CompanyDetailPage({
                   <Input id="title" name="title" className="h-10 rounded-xl" />
                 </div>
                 <div className="space-y-2">
+                  <RequiredLabel htmlFor="department">Department</RequiredLabel>
+                  <Input
+                    id="department"
+                    name="department"
+                    className="h-10 rounded-xl"
+                  />
+                </div>
+                <div className="space-y-2">
                   <RequiredLabel htmlFor="email">Email</RequiredLabel>
                   <Input
                     id="email"
@@ -271,7 +303,7 @@ export default async function CompanyDetailPage({
                     className="h-10 rounded-xl"
                   />
                 </div>
-                <div className="space-y-2 sm:col-span-2">
+                <div className="space-y-2">
                   <RequiredLabel htmlFor="linkedinUrl">
                     LinkedIn URL
                   </RequiredLabel>
@@ -280,6 +312,35 @@ export default async function CompanyDetailPage({
                     name="linkedinUrl"
                     className="h-10 rounded-xl"
                   />
+                </div>
+                <div className="space-y-2">
+                  <RequiredLabel htmlFor="confidence">Confidence</RequiredLabel>
+                  <Input
+                    id="confidence"
+                    name="confidence"
+                    type="number"
+                    min={0}
+                    max={1}
+                    step={0.1}
+                    defaultValue={0.8}
+                    className="h-10 rounded-xl"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <RequiredLabel htmlFor="emailStatus">
+                    Email status
+                  </RequiredLabel>
+                  <select
+                    id="emailStatus"
+                    name="emailStatus"
+                    defaultValue="unknown"
+                    className="border-input bg-background focus-visible:ring-ring flex h-10 w-full rounded-xl border px-3 text-sm outline-none focus-visible:ring-2"
+                  >
+                    <option value="unknown">unknown</option>
+                    <option value="inferred">inferred</option>
+                    <option value="verified">verified</option>
+                    <option value="bounced">bounced</option>
+                  </select>
                 </div>
               </div>
               <PendingSubmitButton
@@ -297,26 +358,176 @@ export default async function CompanyDetailPage({
               contacts.map((contact) => (
                 <div
                   key={contact.id}
-                  className="border-border/70 rounded-xl border p-3 text-sm"
+                  className="border-border/70 space-y-3 rounded-xl border p-3 text-sm"
                 >
-                  <p className="font-medium">{contact.fullName}</p>
-                  <p className="text-muted-foreground">
-                    {[contact.title, contact.email].filter(Boolean).join(" · ")}
-                  </p>
-                  {contact.suppressedAt ? (
-                    <Badge
-                      variant="secondary"
-                      className="mt-2 rounded-full px-2.5 py-0.5 text-xs"
-                    >
-                      suppressed
-                    </Badge>
-                  ) : null}
+                  <form action={updateContactAction} className="space-y-3">
+                    <input type="hidden" name="contactId" value={contact.id} />
+                    <input type="hidden" name="companyId" value={company.id} />
+                    <input
+                      type="hidden"
+                      name="returnTo"
+                      value={`/companies/${company.id}?tab=contacts`}
+                    />
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <div className="space-y-2 sm:col-span-2">
+                        <RequiredLabel
+                          htmlFor={`edit-name-${contact.id}`}
+                          required
+                        >
+                          Full name
+                        </RequiredLabel>
+                        <Input
+                          id={`edit-name-${contact.id}`}
+                          name="fullName"
+                          defaultValue={contact.fullName}
+                          required
+                          className="h-10 rounded-xl"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <RequiredLabel htmlFor={`edit-title-${contact.id}`}>
+                          Title
+                        </RequiredLabel>
+                        <Input
+                          id={`edit-title-${contact.id}`}
+                          name="title"
+                          defaultValue={contact.title}
+                          className="h-10 rounded-xl"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <RequiredLabel
+                          htmlFor={`edit-department-${contact.id}`}
+                        >
+                          Department
+                        </RequiredLabel>
+                        <Input
+                          id={`edit-department-${contact.id}`}
+                          name="department"
+                          defaultValue={contact.department}
+                          className="h-10 rounded-xl"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <RequiredLabel htmlFor={`edit-email-${contact.id}`}>
+                          Email
+                        </RequiredLabel>
+                        <Input
+                          id={`edit-email-${contact.id}`}
+                          name="email"
+                          type="email"
+                          defaultValue={contact.email}
+                          className="h-10 rounded-xl"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <RequiredLabel htmlFor={`edit-linkedin-${contact.id}`}>
+                          LinkedIn URL
+                        </RequiredLabel>
+                        <Input
+                          id={`edit-linkedin-${contact.id}`}
+                          name="linkedinUrl"
+                          defaultValue={contact.linkedinUrl}
+                          className="h-10 rounded-xl"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <RequiredLabel
+                          htmlFor={`edit-confidence-${contact.id}`}
+                        >
+                          Confidence
+                        </RequiredLabel>
+                        <Input
+                          id={`edit-confidence-${contact.id}`}
+                          name="confidence"
+                          type="number"
+                          min={0}
+                          max={1}
+                          step={0.1}
+                          defaultValue={contact.confidence}
+                          className="h-10 rounded-xl"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <RequiredLabel htmlFor={`edit-status-${contact.id}`}>
+                          Email status
+                        </RequiredLabel>
+                        <select
+                          id={`edit-status-${contact.id}`}
+                          name="emailStatus"
+                          defaultValue={contact.emailStatus}
+                          className="border-input bg-background focus-visible:ring-ring flex h-10 w-full rounded-xl border px-3 text-sm outline-none focus-visible:ring-2"
+                        >
+                          <option value="unknown">unknown</option>
+                          <option value="inferred">inferred</option>
+                          <option value="verified">verified</option>
+                          <option value="bounced">bounced</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <PendingSubmitButton
+                        idleLabel="Save contact"
+                        pendingLabel="Saving…"
+                      />
+                      {contact.suppressedAt ? (
+                        <Badge
+                          variant="secondary"
+                          className="rounded-full px-2.5 py-0.5 text-xs"
+                        >
+                          suppressed
+                        </Badge>
+                      ) : null}
+                    </div>
+                  </form>
+                  <div className="flex flex-wrap gap-2">
+                    {!contact.suppressedAt ? (
+                      <form action={suppressContactAction}>
+                        <input
+                          type="hidden"
+                          name="contactId"
+                          value={contact.id}
+                        />
+                        <input
+                          type="hidden"
+                          name="returnTo"
+                          value={`/companies/${company.id}?tab=contacts`}
+                        />
+                        <Button
+                          type="submit"
+                          variant="outline"
+                          className="h-8 rounded-xl"
+                        >
+                          Suppress
+                        </Button>
+                      </form>
+                    ) : null}
+                    <form action={deleteContactAction}>
+                      <input
+                        type="hidden"
+                        name="contactId"
+                        value={contact.id}
+                      />
+                      <input
+                        type="hidden"
+                        name="returnTo"
+                        value={`/companies/${company.id}?tab=contacts`}
+                      />
+                      <Button
+                        type="submit"
+                        variant="outline"
+                        className="text-destructive h-8 rounded-xl"
+                      >
+                        Delete
+                      </Button>
+                    </form>
+                  </div>
                 </div>
               ))
             )}
           </CardContent>
         </Card>
-      </div>
+      )}
     </FadeIn>
   );
 }

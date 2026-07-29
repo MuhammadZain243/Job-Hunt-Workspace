@@ -6,7 +6,10 @@ import { recordAuditEvent } from "@/modules/audit/audit.service";
 import { getCompany } from "@/modules/companies/company.service";
 import { ContactModel } from "@/modules/contacts/contact.model";
 import type { SourceRef } from "@/modules/shared/source.types";
-import { createContactSchema } from "@/modules/contacts/contact.validation";
+import {
+  createContactSchema,
+  updateContactSchema,
+} from "@/modules/contacts/contact.validation";
 
 function mapContact(doc: {
   _id: { toString(): string };
@@ -109,6 +112,57 @@ export async function createContact(userId: string, input: unknown) {
   });
 
   return mapContact(doc.toObject());
+}
+
+export async function getContact(userId: string, contactId: string) {
+  await connectMongoose();
+  const doc = await ContactModel.findOne({ _id: contactId, userId }).lean();
+  if (!doc) {
+    throw new NotFoundError("Contact not found");
+  }
+  return mapContact(doc);
+}
+
+export async function updateContact(userId: string, input: unknown) {
+  await connectMongoose();
+  const parsed = updateContactSchema.parse(input);
+
+  if (!parsed.email && !parsed.linkedinUrl) {
+    throw new ValidationError(
+      "Provide an email or LinkedIn URL for the contact",
+    );
+  }
+
+  const doc = await ContactModel.findOneAndUpdate(
+    { _id: parsed.contactId, userId },
+    {
+      $set: {
+        fullName: parsed.fullName.trim(),
+        title: parsed.title?.trim() ?? "",
+        department: parsed.department?.trim() ?? "",
+        email: parsed.email?.trim().toLowerCase() ?? "",
+        emailStatus: parsed.emailStatus,
+        linkedinUrl: parsed.linkedinUrl?.trim() ?? "",
+        confidence: parsed.confidence,
+        reviewedAt: new Date(),
+      },
+    },
+    { returnDocument: "after" },
+  ).lean();
+
+  if (!doc) {
+    throw new NotFoundError("Contact not found");
+  }
+
+  await recordAuditEvent({
+    userId,
+    action: "contact.updated",
+    entityType: "contact",
+    entityId: parsed.contactId,
+    metadata: {},
+  });
+
+  return mapContact(doc);
 }
 
 export async function suppressContact(userId: string, contactId: string) {

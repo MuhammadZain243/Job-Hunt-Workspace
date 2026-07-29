@@ -19,4 +19,30 @@ export const updateJobReviewSchema = z.object({
   workplaceType: z.string().trim().max(80).optional().or(z.literal("")),
   employmentType: z.string().trim().max(80).optional().or(z.literal("")),
   applicationUrl: z.string().trim().max(1000).optional().or(z.literal("")),
+  requirementsText: z.string().trim().max(20_000).optional().or(z.literal("")),
+  responsibilitiesText: z
+    .string()
+    .trim()
+    .max(20_000)
+    .optional()
+    .or(z.literal("")),
+  skillsText: z.string().trim().max(5_000).optional().or(z.literal("")),
 });
+
+export function linesFromTextarea(value: string | undefined): string[] {
+  if (!value?.trim()) return [];
+  return value
+    .split(/\r?\n/)
+    .map((line) => line.replace(/^[•\-–—*·]\s+/, "").trim())
+    .filter(Boolean)
+    .slice(0, 60);
+}
+
+export function csvFromTextarea(value: string | undefined): string[] {
+  if (!value?.trim()) return [];
+  return value
+    .split(/[,•|;\n]/)
+    .map((part) => part.trim())
+    .filter((part) => part.length >= 2 && part.length <= 80)
+    .slice(0, 60);
+}
