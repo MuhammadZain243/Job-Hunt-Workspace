@@ -7,6 +7,35 @@ export type NavItem = {
   comingSoon?: boolean;
 };
 
+export const settingsNavItems: NavItem[] = [
+  {
+    title: "Storage",
+    href: "/settings/storage",
+    icon: "hard-drive",
+    enabled: true,
+  },
+  {
+    title: "OpenAI",
+    href: "/settings/openai",
+    icon: "sparkles",
+    enabled: true,
+  },
+  {
+    title: "Gmail",
+    href: "/settings/gmail",
+    icon: "mail",
+    enabled: false,
+    comingSoon: true,
+  },
+  {
+    title: "LinkedIn",
+    href: "/settings/linkedin",
+    icon: "users",
+    enabled: false,
+    comingSoon: true,
+  },
+];
+
 export const workspaceNavItems: NavItem[] = [
   {
     title: "Dashboard",
@@ -33,6 +62,12 @@ export const workspaceNavItems: NavItem[] = [
     enabled: true,
   },
   {
+    title: "Outreach",
+    href: "/outreach",
+    icon: "mail",
+    enabled: true,
+  },
+  {
     title: "Contacts",
     href: "/contacts",
     icon: "users",
@@ -41,7 +76,7 @@ export const workspaceNavItems: NavItem[] = [
   {
     title: "Email Sequences",
     href: "/email-sequences",
-    icon: "mail",
+    icon: "waypoints",
     enabled: false,
     comingSoon: true,
   },

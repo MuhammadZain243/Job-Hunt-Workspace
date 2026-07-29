@@ -176,7 +176,7 @@ export async function listProviderConnections(userId: string) {
     status: connection.status,
     lastCheckedAt: connection.lastCheckedAt ?? null,
     maskedLabel:
-      connection.provider === "cloudinary"
+      connection.provider === "cloudinary" || connection.provider === "openai"
         ? connection.accountLabel
         : maskValue(connection.accountLabel),
   }));

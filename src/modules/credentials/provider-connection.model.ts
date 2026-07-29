@@ -5,7 +5,11 @@ import mongoose, { Schema, type InferSchemaType, type Model } from "mongoose";
 const providerConnectionSchema = new Schema(
   {
     userId: { type: String, required: true, index: true },
-    provider: { type: String, required: true, enum: ["cloudinary", "s3"] },
+    provider: {
+      type: String,
+      required: true,
+      enum: ["cloudinary", "s3", "openai"],
+    },
     accountLabel: { type: String, required: true },
     externalAccountId: { type: String },
     scopes: { type: [String], default: [] },

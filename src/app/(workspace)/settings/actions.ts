@@ -32,6 +32,11 @@ const providerSchema = z.object({
   provider: z.enum(["local", "cloudinary", "s3"]),
 });
 
+function revalidateSettings() {
+  revalidatePath("/settings/storage");
+  revalidatePath("/settings/openai");
+}
+
 async function fallbackProviderAfterDisconnect(
   userId: string,
   disconnected: "cloudinary" | "s3",
@@ -73,22 +78,22 @@ export async function updateStorageProviderAction(
   });
 
   if (!parsed.success) {
-    redirect("/settings?storageError=invalid-provider");
+    redirect("/settings/storage?storageError=invalid-provider");
   }
 
   try {
     await updateCvStorageProvider(user.id, parsed.data.provider);
-    revalidatePath("/settings");
-    redirect(`/settings?storageSuccess=${parsed.data.provider}`);
+    revalidateSettings();
+    redirect(`/settings/storage?storageSuccess=${parsed.data.provider}`);
   } catch (error) {
     if (isRedirectError(error)) throw error;
     if (isAppError(error) && error.code === "POLICY_VIOLATION") {
-      redirect("/settings?storageError=local-production");
+      redirect("/settings/storage?storageError=local-production");
     }
     if (isAppError(error) && error.code === "VALIDATION_ERROR") {
-      redirect("/settings?storageError=not-connected");
+      redirect("/settings/storage?storageError=not-connected");
     }
-    redirect("/settings?storageError=invalid-provider");
+    redirect("/settings/storage?storageError=invalid-provider");
   }
 }
 
@@ -98,13 +103,13 @@ export async function testLocalStorageAction(): Promise<void> {
     const provider = createLocalStorageProvider();
     const health = await provider.testConnection();
     redirect(
-      `/settings?localStatus=${encodeURIComponent(
+      `/settings/storage?localStatus=${encodeURIComponent(
         health.detail ? `${health.label}: ${health.detail}` : health.label,
       )}`,
     );
   } catch (error) {
     if (isRedirectError(error)) throw error;
-    redirect("/settings?storageError=local-production");
+    redirect("/settings/storage?storageError=local-production");
   }
 }
 
@@ -119,7 +124,7 @@ export async function saveCloudinaryConnectionAction(
   });
 
   if (!parsed.success) {
-    redirect("/settings?cloudinaryError=invalid-credentials");
+    redirect("/settings/storage?cloudinaryError=invalid-credentials");
   }
 
   try {
@@ -143,13 +148,13 @@ export async function saveCloudinaryConnectionAction(
       metadata: { provider: "cloudinary" },
     });
 
-    revalidatePath("/settings");
+    revalidateSettings();
   } catch (error) {
     if (isRedirectError(error)) throw error;
-    redirect("/settings?cloudinaryError=connection-failed");
+    redirect("/settings/storage?cloudinaryError=connection-failed");
   }
 
-  redirect("/settings?cloudinarySuccess=connected");
+  redirect("/settings/storage?cloudinarySuccess=connected");
 }
 
 export async function saveS3ConnectionAction(
@@ -166,7 +171,7 @@ export async function saveS3ConnectionAction(
   });
 
   if (!parsed.success) {
-    redirect("/settings?s3Error=invalid-credentials");
+    redirect("/settings/storage?s3Error=invalid-credentials");
   }
 
   try {
@@ -190,13 +195,13 @@ export async function saveS3ConnectionAction(
       metadata: { provider: "s3" },
     });
 
-    revalidatePath("/settings");
+    revalidateSettings();
   } catch (error) {
     if (isRedirectError(error)) throw error;
-    redirect("/settings?s3Error=connection-failed");
+    redirect("/settings/storage?s3Error=connection-failed");
   }
 
-  redirect("/settings?s3Success=connected");
+  redirect("/settings/storage?s3Success=connected");
 }
 
 export async function disconnectCloudinaryAction(): Promise<void> {
@@ -216,13 +221,13 @@ export async function disconnectCloudinaryAction(): Promise<void> {
       metadata: { provider: "cloudinary" },
     });
 
-    revalidatePath("/settings");
+    revalidateSettings();
   } catch (error) {
     if (isRedirectError(error)) throw error;
-    redirect("/settings?disconnectError=cloudinary");
+    redirect("/settings/storage?disconnectError=cloudinary");
   }
 
-  redirect("/settings?disconnectSuccess=cloudinary");
+  redirect("/settings/storage?disconnectSuccess=cloudinary");
 }
 
 export async function disconnectS3Action(): Promise<void> {
@@ -242,11 +247,51 @@ export async function disconnectS3Action(): Promise<void> {
       metadata: { provider: "s3" },
     });
 
-    revalidatePath("/settings");
+    revalidateSettings();
   } catch (error) {
     if (isRedirectError(error)) throw error;
-    redirect("/settings?disconnectError=s3");
+    redirect("/settings/storage?disconnectError=s3");
   }
 
-  redirect("/settings?disconnectSuccess=s3");
+  redirect("/settings/storage?disconnectSuccess=s3");
+}
+
+export async function saveOpenAiConnectionAction(
+  formData: FormData,
+): Promise<void> {
+  const { user } = await requireSession();
+  try {
+    const { saveAndTestOpenAiConnection } =
+      await import("@/modules/ai/ai-generation.service");
+    await saveAndTestOpenAiConnection(
+      user.id,
+      String(formData.get("apiKey") ?? ""),
+    );
+    revalidateSettings();
+    revalidatePath("/outreach");
+  } catch (error) {
+    if (isRedirectError(error)) throw error;
+    if (isAppError(error) && error.code === "PROVIDER_AUTH_ERROR") {
+      redirect("/settings/openai?openaiError=invalid-key");
+    }
+    redirect("/settings/openai?openaiError=connection-failed");
+  }
+
+  redirect("/settings/openai?openaiSuccess=connected");
+}
+
+export async function disconnectOpenAiAction(): Promise<void> {
+  const { user } = await requireSession();
+  try {
+    const { disconnectOpenAiConnection } =
+      await import("@/modules/ai/ai-generation.service");
+    await disconnectOpenAiConnection(user.id);
+    revalidateSettings();
+    revalidatePath("/outreach");
+  } catch (error) {
+    if (isRedirectError(error)) throw error;
+    redirect("/settings/openai?disconnectError=openai");
+  }
+
+  redirect("/settings/openai?disconnectSuccess=openai");
 }

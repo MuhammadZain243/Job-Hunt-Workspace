@@ -7,6 +7,7 @@ import {
   Mail,
   Settings,
   Users,
+  Waypoints,
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
@@ -22,6 +23,7 @@ const iconMap: Record<NavItem["icon"], LucideIcon> = {
   kanban: Kanban,
   users: Users,
   mail: Mail,
+  waypoints: Waypoints,
   "file-text": FileText,
   settings: Settings,
 };

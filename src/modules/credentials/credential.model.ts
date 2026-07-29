@@ -5,7 +5,11 @@ import mongoose, { Schema, type InferSchemaType, type Model } from "mongoose";
 const encryptedCredentialSchema = new Schema(
   {
     userId: { type: String, required: true, index: true },
-    provider: { type: String, required: true, enum: ["cloudinary", "s3"] },
+    provider: {
+      type: String,
+      required: true,
+      enum: ["cloudinary", "s3", "openai"],
+    },
     ciphertext: { type: String, required: true },
     iv: { type: String, required: true },
     authTag: { type: String, required: true },

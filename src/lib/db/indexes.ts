@@ -1,6 +1,7 @@
 import "server-only";
 
 import { connectMongoose } from "@/lib/db/mongoose";
+import { AiGenerationModel } from "@/modules/ai/ai-generation.model";
 import { ApplicationModel } from "@/modules/applications/application.model";
 import { AuditEventModel } from "@/modules/audit/audit.model";
 import { CandidateProfileModel } from "@/modules/candidate-profile/candidate-profile.model";
@@ -32,5 +33,6 @@ export async function ensurePhase0Indexes(): Promise<void> {
     JobModel.createIndexes(),
     SourceDocumentModel.createIndexes(),
     ApplicationModel.createIndexes(),
+    AiGenerationModel.createIndexes(),
   ]);
 }

@@ -1,4 +1,4 @@
-export type StoredCredentialProvider = "cloudinary" | "s3";
+export type StoredCredentialProvider = "cloudinary" | "s3" | "openai";
 
 export type EncryptedCredentialSummary = {
   credentialId: string;

@@ -145,6 +145,12 @@ export default async function ApplicationsPage({
                     >
                       Open job
                     </Link>
+                    <Link
+                      href={`/outreach?applicationId=${application.id}`}
+                      className="text-sm underline"
+                    >
+                      Outreach drafts
+                    </Link>
                     {nextStatuses.length > 0 ? (
                       <form
                         action={transitionApplicationAction}
