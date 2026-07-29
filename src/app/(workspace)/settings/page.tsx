@@ -33,8 +33,7 @@ export const metadata: Metadata = {
 
 function getFeedback(
   searchParams:
-    | Promise<Record<string, string | string[] | undefined>>
-    | undefined,
+    Promise<Record<string, string | string[] | undefined>> | undefined,
 ): Promise<{ success?: string; error?: string }> {
   return Promise.resolve(searchParams).then((params) => {
     const getValue = (key: string) => {
@@ -100,11 +99,14 @@ function getFeedback(
     }
     if (disconnectSuccess === "cloudinary") {
       return {
-        success: "Cloudinary disconnected. Configuration deleted from the database.",
+        success:
+          "Cloudinary disconnected. Configuration deleted from the database.",
       };
     }
     if (disconnectSuccess === "s3") {
-      return { success: "S3 disconnected. Configuration deleted from the database." };
+      return {
+        success: "S3 disconnected. Configuration deleted from the database.",
+      };
     }
     if (disconnectError === "cloudinary") {
       return { error: "Could not disconnect Cloudinary. Try again." };
@@ -134,14 +136,14 @@ function ProviderOption({
 }) {
   return (
     <label
-      className={`flex flex-col gap-3 rounded-2xl border border-border/80 bg-background/80 p-4 shadow-sm transition-colors ${
+      className={`border-border/80 bg-background/80 flex flex-col gap-3 rounded-2xl border p-4 shadow-sm transition-colors ${
         disabled
           ? "cursor-not-allowed opacity-60"
-          : "cursor-pointer hover:bg-muted/40"
+          : "hover:bg-muted/40 cursor-pointer"
       }`}
     >
       <div className="flex items-center justify-between gap-3">
-        <Icon className="size-5 text-foreground" />
+        <Icon className="text-foreground size-5" />
         <input
           type="radio"
           name="provider"
@@ -153,7 +155,7 @@ function ProviderOption({
       </div>
       <div>
         <p className="text-sm font-medium">{title}</p>
-        <p className="mt-1 text-sm leading-6 text-muted-foreground">{detail}</p>
+        <p className="text-muted-foreground mt-1 text-sm leading-6">{detail}</p>
       </div>
     </label>
   );
@@ -189,14 +191,14 @@ export default async function SettingsPage({
 
       <div className="space-y-2">
         <h1 className="text-3xl font-semibold tracking-tight">Settings</h1>
-        <p className="max-w-3xl text-sm leading-6 text-muted-foreground">
-          Manage CV storage. Choose an active provider, connect Cloudinary or
-          S3 securely, and verify the local development path when available.
+        <p className="text-muted-foreground max-w-3xl text-sm leading-6">
+          Manage CV storage. Choose an active provider, connect Cloudinary or S3
+          securely, and verify the local development path when available.
         </p>
       </div>
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
-        <Card className="rounded-2xl border-border/80 shadow-none">
+        <Card className="border-border/80 rounded-2xl shadow-none">
           <CardHeader>
             <div className="flex items-center justify-between gap-3">
               <div>
@@ -251,8 +253,8 @@ export default async function SettingsPage({
             </form>
 
             {settings.resumeCount > 0 ? (
-              <div className="rounded-2xl border border-border/80 bg-muted/25 p-4">
-                <p className="text-sm leading-6 text-muted-foreground">
+              <div className="border-border/80 bg-muted/25 rounded-2xl border p-4">
+                <p className="text-muted-foreground text-sm leading-6">
                   You already have {settings.resumeCount} CV
                   {settings.resumeCount === 1 ? "" : "s"} stored. Changing the
                   active provider affects new uploads only. Existing files keep
@@ -261,10 +263,10 @@ export default async function SettingsPage({
               </div>
             ) : null}
 
-            <div className="rounded-2xl border border-border/80 bg-muted/25 p-4">
+            <div className="border-border/80 bg-muted/25 rounded-2xl border p-4">
               <div className="flex items-start gap-3">
-                <ShieldCheck className="mt-0.5 size-4 text-foreground" />
-                <p className="text-sm leading-6 text-muted-foreground">
+                <ShieldCheck className="text-foreground mt-0.5 size-4" />
+                <p className="text-muted-foreground text-sm leading-6">
                   Provider secrets stay server-side and are encrypted in
                   MongoDB. The browser only sees masked labels and connection
                   state.
@@ -275,7 +277,7 @@ export default async function SettingsPage({
         </Card>
 
         <div className="space-y-5">
-          <Card className="rounded-2xl border-border/80 shadow-none">
+          <Card className="border-border/80 rounded-2xl shadow-none">
             <CardHeader>
               <CardTitle>Cloudinary connection</CardTitle>
               <CardDescription>
@@ -284,13 +286,13 @@ export default async function SettingsPage({
             </CardHeader>
             <CardContent className="space-y-4">
               {isCloudinaryConnected ? (
-                <div className="space-y-4 rounded-2xl border border-border/80 bg-background/70 p-4 text-sm">
+                <div className="border-border/80 bg-background/70 space-y-4 rounded-2xl border p-4 text-sm">
                   <div>
                     <p className="font-medium">Connected account</p>
-                    <p className="mt-1 text-muted-foreground">
+                    <p className="text-muted-foreground mt-1">
                       {cloudinaryConnection.accountLabel}
                     </p>
-                    <p className="mt-1 text-muted-foreground">
+                    <p className="text-muted-foreground mt-1">
                       Status: {cloudinaryConnection.status}
                       {cloudinaryConnection.lastCheckedAt
                         ? ` · checked ${new Date(cloudinaryConnection.lastCheckedAt).toLocaleString()}`
@@ -357,7 +359,7 @@ export default async function SettingsPage({
             </CardContent>
           </Card>
 
-          <Card className="rounded-2xl border-border/80 shadow-none">
+          <Card className="border-border/80 rounded-2xl shadow-none">
             <CardHeader>
               <CardTitle>S3-compatible connection</CardTitle>
               <CardDescription>
@@ -367,13 +369,13 @@ export default async function SettingsPage({
             </CardHeader>
             <CardContent className="space-y-4">
               {isS3Connected ? (
-                <div className="space-y-4 rounded-2xl border border-border/80 bg-background/70 p-4 text-sm">
+                <div className="border-border/80 bg-background/70 space-y-4 rounded-2xl border p-4 text-sm">
                   <div>
                     <p className="font-medium">Connected bucket</p>
-                    <p className="mt-1 text-muted-foreground">
+                    <p className="text-muted-foreground mt-1">
                       {s3Connection.accountLabel}
                     </p>
-                    <p className="mt-1 text-muted-foreground">
+                    <p className="text-muted-foreground mt-1">
                       Status: {s3Connection.status}
                     </p>
                   </div>
@@ -442,7 +444,7 @@ export default async function SettingsPage({
                     className="h-10 rounded-xl"
                   />
                 </div>
-                <label className="flex items-center gap-2 text-sm text-muted-foreground">
+                <label className="text-muted-foreground flex items-center gap-2 text-sm">
                   <input
                     type="checkbox"
                     name="forcePathStyle"
@@ -462,7 +464,7 @@ export default async function SettingsPage({
           </Card>
 
           {!settings.isProduction ? (
-            <Card className="rounded-2xl border-border/80 shadow-none">
+            <Card className="border-border/80 rounded-2xl shadow-none">
               <CardHeader>
                 <CardTitle>Local storage check</CardTitle>
                 <CardDescription>

@@ -40,7 +40,10 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${sourceSans.variable} ${plexMono.variable} h-full antialiased`}
     >
-      <body suppressHydrationWarning className="min-h-full flex flex-col font-sans">
+      <body
+        suppressHydrationWarning
+        className="flex min-h-full flex-col font-sans"
+      >
         {children}
         <Toaster />
       </body>

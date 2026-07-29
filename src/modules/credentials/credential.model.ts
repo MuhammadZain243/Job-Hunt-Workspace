@@ -25,11 +25,14 @@ const encryptedCredentialSchema = new Schema(
 
 encryptedCredentialSchema.index({ userId: 1, provider: 1, revokedAt: 1 });
 
-export type EncryptedCredentialLean = InferSchemaType<typeof encryptedCredentialSchema>;
+export type EncryptedCredentialLean = InferSchemaType<
+  typeof encryptedCredentialSchema
+>;
 export type EncryptedCredentialModelType = Model<EncryptedCredentialLean>;
 
 export const EncryptedCredentialModel: EncryptedCredentialModelType =
-  (mongoose.models.EncryptedCredential as EncryptedCredentialModelType | undefined) ??
+  (mongoose.models.EncryptedCredential as
+    EncryptedCredentialModelType | undefined) ??
   mongoose.model<EncryptedCredentialLean>(
     "EncryptedCredential",
     encryptedCredentialSchema,

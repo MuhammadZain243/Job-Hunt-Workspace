@@ -36,7 +36,10 @@ const MAX_METADATA_JSON_BYTES = 4_096;
 
 function isSensitiveKey(key: string): boolean {
   const normalized = key.toLowerCase();
-  if (SENSITIVE_METADATA_KEYS.has(key) || SENSITIVE_METADATA_KEYS.has(normalized)) {
+  if (
+    SENSITIVE_METADATA_KEYS.has(key) ||
+    SENSITIVE_METADATA_KEYS.has(normalized)
+  ) {
     return true;
   }
   return (

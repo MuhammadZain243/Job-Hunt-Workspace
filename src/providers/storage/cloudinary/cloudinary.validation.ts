@@ -8,4 +8,6 @@ export const cloudinaryCredentialsSchema = z.object({
   apiSecret: z.string().min(1, "API secret is required"),
 });
 
-export type CloudinaryCredentialsInput = z.infer<typeof cloudinaryCredentialsSchema>;
+export type CloudinaryCredentialsInput = z.infer<
+  typeof cloudinaryCredentialsSchema
+>;

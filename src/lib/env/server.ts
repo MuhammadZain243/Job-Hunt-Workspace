@@ -34,8 +34,7 @@ const encryptionMasterKeySchema = z
     if (decoded.length !== 32) {
       ctx.addIssue({
         code: "custom",
-        message:
-          "APP_ENCRYPTION_MASTER_KEY must decode to exactly 32 bytes",
+        message: "APP_ENCRYPTION_MASTER_KEY must decode to exactly 32 bytes",
       });
     }
   });
@@ -44,7 +43,9 @@ export const serverEnvSchema = z.object({
   NODE_ENV: z
     .enum(["development", "test", "production"])
     .default("development"),
-  NEXT_PUBLIC_APP_URL: z.string().url("NEXT_PUBLIC_APP_URL must be a valid URL"),
+  NEXT_PUBLIC_APP_URL: z
+    .string()
+    .url("NEXT_PUBLIC_APP_URL must be a valid URL"),
   MONGODB_URI: z.string().min(1, "MONGODB_URI is required"),
   MONGODB_DB_NAME: z.string().min(1, "MONGODB_DB_NAME is required"),
   BETTER_AUTH_SECRET: z
@@ -56,9 +57,7 @@ export const serverEnvSchema = z.object({
     .int()
     .positive("APP_ENCRYPTION_KEY_VERSION must be a positive integer")
     .default(1),
-  CV_STORAGE_DEFAULT_PROVIDER: z
-    .enum(CV_STORAGE_PROVIDERS)
-    .default("local"),
+  CV_STORAGE_DEFAULT_PROVIDER: z.enum(CV_STORAGE_PROVIDERS).default("local"),
   LOCAL_PRIVATE_STORAGE_PATH: z
     .string()
     .min(1)
@@ -84,8 +83,7 @@ const SAFE_FIELD_HINTS: Record<string, string> = {
   MONGODB_URI: "Must be a non-empty connection string",
   MONGODB_DB_NAME: "Must be a non-empty database name",
   BETTER_AUTH_SECRET: "Must be at least 32 characters",
-  APP_ENCRYPTION_MASTER_KEY:
-    "Must be base64 encoding of exactly 32 bytes",
+  APP_ENCRYPTION_MASTER_KEY: "Must be base64 encoding of exactly 32 bytes",
   APP_ENCRYPTION_KEY_VERSION: "Must be a positive integer",
   CV_STORAGE_DEFAULT_PROVIDER: "Must be local, cloudinary, or s3",
   LOCAL_PRIVATE_STORAGE_PATH: "Must be a non-empty path",

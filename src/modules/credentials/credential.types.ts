@@ -10,8 +10,4 @@ export type EncryptedCredentialSummary = {
 };
 
 export type ProviderConnectionStatus =
-  | "connected"
-  | "expired"
-  | "revoked"
-  | "error"
-  | "disconnected";
+  "connected" | "expired" | "revoked" | "error" | "disconnected";

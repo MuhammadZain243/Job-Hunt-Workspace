@@ -40,7 +40,12 @@ export type DraftCandidateProfile = {
 };
 
 const SECTION_ALIASES: Record<
-  "skills" | "experience" | "education" | "projects" | "achievements" | "summary",
+  | "skills"
+  | "experience"
+  | "education"
+  | "projects"
+  | "achievements"
+  | "summary",
   RegExp
 > = {
   skills: /^(skills?|technical skills|core competencies)\b/i,
@@ -48,8 +53,7 @@ const SECTION_ALIASES: Record<
     /^(experience|work experience|professional experience|employment)\b/i,
   education: /^(education|academic background|academics)\b/i,
   projects: /^(projects?|selected projects|personal projects)\b/i,
-  achievements:
-    /^(achievements?|awards?|honors?|accomplishments?)\b/i,
+  achievements: /^(achievements?|awards?|honors?|accomplishments?)\b/i,
   summary: /^(summary|profile|about|objective|professional summary)\b/i,
 };
 
@@ -57,9 +61,7 @@ function normalizeHeading(line: string) {
   return line.replace(/[:\-–—|•]/g, " ").trim();
 }
 
-function detectSection(
-  line: string,
-): keyof typeof SECTION_ALIASES | null {
+function detectSection(line: string): keyof typeof SECTION_ALIASES | null {
   const heading = normalizeHeading(line);
   for (const [key, pattern] of Object.entries(SECTION_ALIASES) as Array<
     [keyof typeof SECTION_ALIASES, RegExp]
@@ -111,9 +113,7 @@ function parseSkills(lines: string[]): DraftCandidateProfile["skills"] {
   return skills.slice(0, 30);
 }
 
-function parseExperience(
-  lines: string[],
-): DraftCandidateProfile["experience"] {
+function parseExperience(lines: string[]): DraftCandidateProfile["experience"] {
   const items: DraftCandidateProfile["experience"] = [];
   let current: DraftCandidateProfile["experience"][number] | null = null;
 
@@ -232,7 +232,9 @@ function parseAchievements(
  * Deterministic draft profile from extracted CV text.
  * AI structuring can refine this later; facts stay evidence-backed.
  */
-export function buildDraftCandidateProfile(text: string): DraftCandidateProfile {
+export function buildDraftCandidateProfile(
+  text: string,
+): DraftCandidateProfile {
   const lines = text
     .split(/\r?\n/)
     .map((line) => line.trim())
@@ -240,9 +242,7 @@ export function buildDraftCandidateProfile(text: string): DraftCandidateProfile 
 
   const sections = splitSections(lines);
 
-  const emailMatch = text.match(
-    /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i,
-  );
+  const emailMatch = text.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
   const phoneMatch = text.match(
     /(?:\+?\d{1,3}[\s.-]?)?(?:\(?\d{2,4}\)?[\s.-]?)?\d{3,4}[\s.-]?\d{3,4}/,
   );
@@ -256,8 +256,7 @@ export function buildDraftCandidateProfile(text: string): DraftCandidateProfile 
   const headline = sections.preamble[0] ?? lines[0] ?? "";
   const summaryFromSection = sections.summary.join(" ").slice(0, 500);
   const summary =
-    summaryFromSection ||
-    sections.preamble.slice(1, 4).join(" ").slice(0, 500);
+    summaryFromSection || sections.preamble.slice(1, 4).join(" ").slice(0, 500);
 
   return {
     headline,

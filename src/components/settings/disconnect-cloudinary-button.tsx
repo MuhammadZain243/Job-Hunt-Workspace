@@ -38,21 +38,21 @@ export function DisconnectCloudinaryButton() {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent
           showCloseButton={false}
-          className="gap-0 overflow-hidden rounded-2xl border border-border bg-background p-0 sm:max-w-md"
+          className="border-border bg-background gap-0 overflow-hidden rounded-2xl border p-0 sm:max-w-md"
         >
           <DialogHeader className="gap-2 px-6 pt-6 pb-4">
             <DialogTitle className="text-lg font-semibold tracking-tight">
               Disconnect Cloudinary?
             </DialogTitle>
-            <DialogDescription className="text-sm leading-6 text-muted-foreground">
+            <DialogDescription className="text-muted-foreground text-sm leading-6">
               This permanently deletes the saved Cloudinary connection and
               encrypted credentials from the database. Existing CV files stay
-              listed, but Cloudinary downloads will fail until you reconnect.
-              If Cloudinary is the active provider, storage switches to local.
+              listed, but Cloudinary downloads will fail until you reconnect. If
+              Cloudinary is the active provider, storage switches to local.
             </DialogDescription>
           </DialogHeader>
 
-          <DialogFooter className="m-0 flex-row justify-end gap-2 rounded-none border-t border-border bg-muted/40 px-6 py-4">
+          <DialogFooter className="border-border bg-muted/40 m-0 flex-row justify-end gap-2 rounded-none border-t px-6 py-4">
             <Button
               type="button"
               variant="outline"
@@ -64,7 +64,7 @@ export function DisconnectCloudinaryButton() {
             </Button>
             <Button
               type="button"
-              className="h-9 rounded-xl bg-destructive px-4 text-sm font-medium text-white hover:bg-destructive/90 focus-visible:border-destructive focus-visible:ring-destructive/30"
+              className="bg-destructive hover:bg-destructive/90 focus-visible:border-destructive focus-visible:ring-destructive/30 h-9 rounded-xl px-4 text-sm font-medium text-white"
               disabled={pending}
               onClick={handleConfirm}
             >

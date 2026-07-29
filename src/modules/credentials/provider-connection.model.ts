@@ -31,14 +31,17 @@ providerConnectionSchema.index(
   { userId: 1, provider: 1, externalAccountId: 1 },
   { unique: true, sparse: true },
 );
-providerConnectionSchema.index(
-  { userId: 1, provider: 1 },
-  { unique: true },
-);
+providerConnectionSchema.index({ userId: 1, provider: 1 }, { unique: true });
 
-export type ProviderConnectionLean = InferSchemaType<typeof providerConnectionSchema>;
+export type ProviderConnectionLean = InferSchemaType<
+  typeof providerConnectionSchema
+>;
 export type ProviderConnectionModelType = Model<ProviderConnectionLean>;
 
 export const ProviderConnectionModel: ProviderConnectionModelType =
-  (mongoose.models.ProviderConnection as ProviderConnectionModelType | undefined) ??
-  mongoose.model<ProviderConnectionLean>("ProviderConnection", providerConnectionSchema);
+  (mongoose.models.ProviderConnection as
+    ProviderConnectionModelType | undefined) ??
+  mongoose.model<ProviderConnectionLean>(
+    "ProviderConnection",
+    providerConnectionSchema,
+  );

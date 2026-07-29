@@ -73,20 +73,20 @@ function CvUploadFields({
             disabled={pending}
             onClick={() => inputRef.current?.click()}
             className={cn(
-              "flex h-10 w-full items-center gap-3 rounded-xl border border-dashed border-border bg-background px-3 text-left text-sm transition-colors hover:bg-muted/40 disabled:pointer-events-none disabled:opacity-50",
+              "border-border bg-background hover:bg-muted/40 flex h-10 w-full items-center gap-3 rounded-xl border border-dashed px-3 text-left text-sm transition-colors disabled:pointer-events-none disabled:opacity-50",
             )}
           >
-            <FileUp className="size-4 shrink-0 text-muted-foreground" />
-            <span className="min-w-0 flex-1 truncate text-muted-foreground">
+            <FileUp className="text-muted-foreground size-4 shrink-0" />
+            <span className="text-muted-foreground min-w-0 flex-1 truncate">
               {file ? file.name : "Choose PDF or DOCX"}
             </span>
             {file ? (
-              <span className="shrink-0 text-xs text-muted-foreground">
+              <span className="text-muted-foreground shrink-0 text-xs">
                 {formatBytes(file.size)}
               </span>
             ) : null}
           </button>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-muted-foreground text-xs">
             PDF or DOCX only, up to 8 MB.
           </p>
         </div>

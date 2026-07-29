@@ -49,7 +49,7 @@ export function SidebarNav({
           return (
             <div
               key={item.href}
-              className="flex items-center justify-between gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground"
+              className="text-muted-foreground flex items-center justify-between gap-2 rounded-md px-3 py-2 text-sm"
               aria-disabled="true"
             >
               <span className="flex items-center gap-2">
@@ -71,9 +71,9 @@ export function SidebarNav({
             href={item.href}
             onClick={onNavigate}
             className={cn(
-              "flex items-center gap-2 rounded-md px-3 py-2 text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring",
+              "focus-visible:ring-ring flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors outline-none focus-visible:ring-2",
               isActive
-                ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
+                ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
                 : "text-sidebar-foreground hover:bg-sidebar-accent/70",
             )}
             aria-current={isActive ? "page" : undefined}

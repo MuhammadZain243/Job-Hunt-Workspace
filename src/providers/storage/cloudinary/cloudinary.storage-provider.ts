@@ -82,7 +82,10 @@ function resolveDownloadTarget(
   };
 }
 
-function toProviderError(error: unknown, fallback: string): ProviderUnavailableError {
+function toProviderError(
+  error: unknown,
+  fallback: string,
+): ProviderUnavailableError {
   const message =
     error && typeof error === "object" && "message" in error
       ? String((error as { message: unknown }).message)
@@ -104,7 +107,9 @@ export class CloudinaryCvStorageProvider implements CvStorageProvider {
 
   constructor(private readonly credentials: CloudinaryCredentialsInput) {}
 
-  async createUploadIntent(input: CreateCvUploadInput): Promise<CvUploadIntent> {
+  async createUploadIntent(
+    input: CreateCvUploadInput,
+  ): Promise<CvUploadIntent> {
     const client = getClient(this.credentials);
     const timestamp = Math.round(Date.now() / 1000);
     const options = uploadOptions(input.userId, input.fileName);
@@ -214,7 +219,8 @@ export class CloudinaryCvStorageProvider implements CvStorageProvider {
         assetId: result.asset_id ?? null,
         publicId: result.public_id,
         version: result.version ?? null,
-        format: result.format ?? (path.extname(input.fileName).slice(1) || null),
+        format:
+          result.format ?? (path.extname(input.fileName).slice(1) || null),
         resourceType: "raw",
         deliveryType,
         bytes: result.bytes ?? input.bytes.byteLength,

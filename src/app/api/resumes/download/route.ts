@@ -14,7 +14,10 @@ export async function GET(request: Request) {
     const resumeId = searchParams.get("resumeId");
 
     if (!resumeId) {
-      return NextResponse.json({ ok: false, error: "Missing resumeId" }, { status: 400 });
+      return NextResponse.json(
+        { ok: false, error: "Missing resumeId" },
+        { status: 400 },
+      );
     }
 
     await connectMongoose();
@@ -25,7 +28,10 @@ export async function GET(request: Request) {
     }).lean();
 
     if (!resume) {
-      return NextResponse.json({ ok: false, error: "Not found" }, { status: 404 });
+      return NextResponse.json(
+        { ok: false, error: "Not found" },
+        { status: 404 },
+      );
     }
 
     const provider = await getCvStorageProviderForName(
@@ -55,8 +61,14 @@ export async function GET(request: Request) {
     });
   } catch (error) {
     if (isAppError(error) && error.code === "UNAUTHORIZED") {
-      return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json(
+        { ok: false, error: "Unauthorized" },
+        { status: 401 },
+      );
     }
-    return NextResponse.json({ ok: false, error: "Download failed" }, { status: 500 });
+    return NextResponse.json(
+      { ok: false, error: "Download failed" },
+      { status: 500 },
+    );
   }
 }

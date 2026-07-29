@@ -3,10 +3,7 @@ import "server-only";
 import { Types } from "mongoose";
 
 import { connectMongoose } from "@/lib/db/mongoose";
-import {
-  ProviderAuthError,
-  ValidationError,
-} from "@/lib/errors/app-error";
+import { ProviderAuthError, ValidationError } from "@/lib/errors/app-error";
 import {
   decryptSecret,
   encryptSecret,

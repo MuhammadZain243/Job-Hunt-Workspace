@@ -18,15 +18,15 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "flex flex-col items-start gap-3 rounded-lg border border-dashed border-border bg-muted/30 px-6 py-10",
+        "border-border bg-muted/30 flex flex-col items-start gap-3 rounded-lg border border-dashed px-6 py-10",
         className,
       )}
       role="status"
     >
-      <Inbox className="size-5 text-muted-foreground" aria-hidden="true" />
+      <Inbox className="text-muted-foreground size-5" aria-hidden="true" />
       <div className="space-y-1">
-        <h2 className="text-base font-medium text-foreground">{title}</h2>
-        <p className="max-w-md text-sm text-muted-foreground">{description}</p>
+        <h2 className="text-foreground text-base font-medium">{title}</h2>
+        <p className="text-muted-foreground max-w-md text-sm">{description}</p>
       </div>
       {action}
     </div>

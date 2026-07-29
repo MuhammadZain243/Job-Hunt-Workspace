@@ -53,7 +53,7 @@ export function ResumeActions({
         <div className="min-w-48 flex-1 space-y-1">
           <label
             htmlFor={`rename-${resumeId}`}
-            className="text-xs text-muted-foreground"
+            className="text-muted-foreground text-xs"
           >
             Rename
           </label>
@@ -157,18 +157,19 @@ export function ResumeActions({
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <DialogContent
           showCloseButton={false}
-          className="gap-0 overflow-hidden rounded-2xl border border-border bg-background p-0 sm:max-w-md"
+          className="border-border bg-background gap-0 overflow-hidden rounded-2xl border p-0 sm:max-w-md"
         >
           <DialogHeader className="gap-2 px-6 pt-6 pb-4">
             <DialogTitle className="text-lg font-semibold tracking-tight">
               Delete this CV?
             </DialogTitle>
-            <DialogDescription className="text-sm leading-6 text-muted-foreground">
-              This permanently removes <span className="font-medium text-foreground">{name}</span> from
+            <DialogDescription className="text-muted-foreground text-sm leading-6">
+              This permanently removes{" "}
+              <span className="text-foreground font-medium">{name}</span> from
               the database and deletes the file from {storageProvider}.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="m-0 flex-row justify-end gap-2 rounded-none border-t border-border bg-muted/40 px-6 py-4">
+          <DialogFooter className="border-border bg-muted/40 m-0 flex-row justify-end gap-2 rounded-none border-t px-6 py-4">
             <Button
               type="button"
               variant="outline"
@@ -180,7 +181,7 @@ export function ResumeActions({
             </Button>
             <Button
               type="button"
-              className="h-9 rounded-xl bg-destructive px-4 text-sm font-medium text-white hover:bg-destructive/90"
+              className="bg-destructive hover:bg-destructive/90 h-9 rounded-xl px-4 text-sm font-medium text-white"
               disabled={pending}
               onClick={() => {
                 const formData = new FormData();

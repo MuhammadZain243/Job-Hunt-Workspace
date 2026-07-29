@@ -62,7 +62,7 @@ function EvidenceNote({ evidence }: { evidence?: Evidence }) {
   }
 
   return (
-    <p className="mt-1 text-xs leading-5 text-muted-foreground">
+    <p className="text-muted-foreground mt-1 text-xs leading-5">
       Evidence ({evidence.source}): {evidence.excerpt}
     </p>
   );
@@ -75,7 +75,7 @@ export function CandidateProfileEditor({
   const [pending, startTransition] = useTransition();
 
   return (
-    <div className="space-y-4 rounded-2xl border border-border/80 bg-muted/20 p-4">
+    <div className="border-border/80 bg-muted/20 space-y-4 rounded-2xl border p-4">
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm font-medium">Candidate profile</p>
         <Badge variant="secondary" className="rounded-full px-3 py-1 text-xs">
@@ -94,7 +94,9 @@ export function CandidateProfileEditor({
         <input type="hidden" name="resumeId" value={resumeId} />
 
         <div className="space-y-2">
-          <RequiredLabel htmlFor={`headline-${resumeId}`}>Headline</RequiredLabel>
+          <RequiredLabel htmlFor={`headline-${resumeId}`}>
+            Headline
+          </RequiredLabel>
           <Input
             id={`headline-${resumeId}`}
             name="headline"
@@ -201,19 +203,19 @@ export function CandidateProfileEditor({
             {profile.experience.map((item, index) => (
               <li
                 key={`${item.title}-${item.company}-${index}`}
-                className="rounded-xl border border-border/70 bg-background/70 p-3 text-sm"
+                className="border-border/70 bg-background/70 rounded-xl border p-3 text-sm"
               >
                 <p className="font-medium">
                   {item.title}
                   {item.company ? ` · ${item.company}` : ""}
                 </p>
                 {item.startDate || item.endDate ? (
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-muted-foreground text-xs">
                     {[item.startDate, item.endDate].filter(Boolean).join(" – ")}
                   </p>
                 ) : null}
                 {item.bullets && item.bullets.length > 0 ? (
-                  <ul className="mt-2 list-disc space-y-1 pl-4 text-muted-foreground">
+                  <ul className="text-muted-foreground mt-2 list-disc space-y-1 pl-4">
                     {item.bullets.map((bullet) => (
                       <li key={bullet}>{bullet}</li>
                     ))}
@@ -233,7 +235,7 @@ export function CandidateProfileEditor({
             {profile.education.map((item, index) => (
               <li
                 key={`${item.school}-${index}`}
-                className="rounded-xl border border-border/70 bg-background/70 p-3 text-sm"
+                className="border-border/70 bg-background/70 rounded-xl border p-3 text-sm"
               >
                 <p className="font-medium">{item.school}</p>
                 <p className="text-muted-foreground">
@@ -253,7 +255,7 @@ export function CandidateProfileEditor({
             {profile.projects.map((item, index) => (
               <li
                 key={`${item.name}-${index}`}
-                className="rounded-xl border border-border/70 bg-background/70 p-3 text-sm"
+                className="border-border/70 bg-background/70 rounded-xl border p-3 text-sm"
               >
                 <p className="font-medium">{item.name}</p>
                 {item.description ? (
@@ -273,7 +275,7 @@ export function CandidateProfileEditor({
             {profile.achievements.map((item, index) => (
               <li
                 key={`${item.text}-${index}`}
-                className="rounded-xl border border-border/70 bg-background/70 p-3 text-sm"
+                className="border-border/70 bg-background/70 rounded-xl border p-3 text-sm"
               >
                 <p>{item.text}</p>
                 <EvidenceNote evidence={item.evidence} />

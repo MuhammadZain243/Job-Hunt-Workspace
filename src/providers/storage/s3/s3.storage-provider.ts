@@ -45,7 +45,9 @@ export class S3CvStorageProvider implements CvStorageProvider {
 
   constructor(private readonly credentials: S3CredentialsInput) {}
 
-  async createUploadIntent(input: CreateCvUploadInput): Promise<CvUploadIntent> {
+  async createUploadIntent(
+    input: CreateCvUploadInput,
+  ): Promise<CvUploadIntent> {
     const client = createS3Client(this.credentials);
     const storageKey = objectKey(input.userId, input.fileName);
     const command = new PutObjectCommand({

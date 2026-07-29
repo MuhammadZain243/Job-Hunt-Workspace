@@ -112,9 +112,7 @@ export async function uploadResume(input: {
   const count = await ResumeModel.countDocuments({ userId: input.userId });
   const isDefault = count === 0;
   const displayName =
-    input.name?.trim() ||
-    input.fileName.replace(/\.(pdf|docx)$/i, "") ||
-    "CV";
+    input.name?.trim() || input.fileName.replace(/\.(pdf|docx)$/i, "") || "CV";
 
   try {
     const resume = await ResumeModel.create({

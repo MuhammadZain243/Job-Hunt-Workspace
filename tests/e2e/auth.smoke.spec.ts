@@ -6,9 +6,7 @@ test.describe("auth route protection", () => {
   }) => {
     await page.goto("/dashboard");
     await expect(page).toHaveURL(/\/login/);
-    await expect(
-      page.getByRole("heading", { name: "Sign in" }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
   });
 
   test("login page is reachable", async ({ page }) => {

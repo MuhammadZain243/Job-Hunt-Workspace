@@ -37,9 +37,7 @@ export async function requireSession(): Promise<{
   };
 }
 
-export async function requireSessionOrRedirect(
-  redirectTo = "/login",
-): Promise<{
+export async function requireSessionOrRedirect(redirectTo = "/login"): Promise<{
   user: SessionUser;
 }> {
   const session = await getSession();

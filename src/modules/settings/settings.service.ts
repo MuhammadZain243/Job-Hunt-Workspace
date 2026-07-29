@@ -2,10 +2,7 @@ import "server-only";
 
 import { connectMongoose } from "@/lib/db/mongoose";
 import { getServerEnv } from "@/lib/env/server";
-import {
-  PolicyViolationError,
-  ValidationError,
-} from "@/lib/errors/app-error";
+import { PolicyViolationError, ValidationError } from "@/lib/errors/app-error";
 import { listProviderConnections } from "@/modules/credentials/credential.service";
 import { ResumeModel } from "@/modules/resumes/resume.model";
 import { AppSettingsModel } from "@/modules/settings/settings.model";

@@ -34,7 +34,10 @@ function hasZipSignature(bytes: Uint8Array): boolean {
   );
 }
 
-export function resolveCvMimeType(fileName: string, declaredMime?: string | null) {
+export function resolveCvMimeType(
+  fileName: string,
+  declaredMime?: string | null,
+) {
   const lower = fileName.toLowerCase();
   if (lower.endsWith(".pdf")) {
     return "application/pdf" as const;

@@ -1,6 +1,11 @@
 import "server-only";
 
-import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:crypto";
+import {
+  createCipheriv,
+  createDecipheriv,
+  createHash,
+  randomBytes,
+} from "node:crypto";
 
 import { getServerEnv } from "@/lib/env/server";
 import type { EncryptedPayload, EncryptionAad } from "@/lib/encryption/types";
@@ -99,7 +104,6 @@ export function rotateSecret(
   newKeyVersion?: number,
 ): EncryptedPayload {
   const plaintext = decryptSecret(payload, aad);
-  const version =
-    newKeyVersion ?? getServerEnv().APP_ENCRYPTION_KEY_VERSION;
+  const version = newKeyVersion ?? getServerEnv().APP_ENCRYPTION_KEY_VERSION;
   return encryptSecret(plaintext, aad, version);
 }

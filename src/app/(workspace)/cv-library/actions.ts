@@ -90,7 +90,9 @@ export async function renameResumeAction(formData: FormData): Promise<void> {
   }
 }
 
-export async function setDefaultResumeAction(formData: FormData): Promise<void> {
+export async function setDefaultResumeAction(
+  formData: FormData,
+): Promise<void> {
   const { user } = await requireSession();
   const resumeId = String(formData.get("resumeId") ?? "");
 

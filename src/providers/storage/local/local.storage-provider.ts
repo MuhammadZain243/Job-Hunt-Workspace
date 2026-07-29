@@ -51,7 +51,9 @@ function assertLocalAllowed(): void {
 export class LocalCvStorageProvider implements CvStorageProvider {
   readonly provider = "local" as const;
 
-  async createUploadIntent(input: CreateCvUploadInput): Promise<CvUploadIntent> {
+  async createUploadIntent(
+    input: CreateCvUploadInput,
+  ): Promise<CvUploadIntent> {
     assertLocalAllowed();
     await mkdir(getLocalStorageRoot(), { recursive: true });
     const extension = path.extname(input.fileName).toLowerCase() || ".bin";

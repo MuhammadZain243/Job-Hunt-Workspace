@@ -36,13 +36,13 @@
 
 ## Tests executed
 
-| Command | Result |
-|---|---|
-| `pnpm typecheck` | passed |
-| `pnpm lint` | passed (0 errors) |
-| `pnpm test` | passed (9 unit tests) |
-| `pnpm build` | passed |
-| `pnpm test:e2e` | passed (2 Playwright smoke tests) |
+| Command          | Result                            |
+| ---------------- | --------------------------------- |
+| `pnpm typecheck` | passed                            |
+| `pnpm lint`      | passed (0 errors)                 |
+| `pnpm test`      | passed (9 unit tests)             |
+| `pnpm build`     | passed                            |
+| `pnpm test:e2e`  | passed (2 Playwright smoke tests) |
 
 ## Build result
 

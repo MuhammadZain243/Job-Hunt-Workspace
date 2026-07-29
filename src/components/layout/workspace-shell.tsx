@@ -35,26 +35,28 @@ export function WorkspaceShell({
   return (
     <div className="min-h-screen bg-[linear-gradient(165deg,oklch(0.985_0.008_95)_0%,oklch(0.97_0.012_230)_100%)]">
       <div className="flex min-h-screen w-full">
-        <aside className="sticky top-0 hidden h-screen w-70 shrink-0 border-r border-sidebar-border/90 bg-sidebar/95 px-4 py-6 md:flex md:flex-col">
+        <aside className="border-sidebar-border/90 bg-sidebar/95 sticky top-0 hidden h-screen w-70 shrink-0 border-r px-4 py-6 md:flex md:flex-col">
           <div className="mb-8 px-3">
-            <p className="text-xs font-medium tracking-[0.14em] text-muted-foreground uppercase">
+            <p className="text-muted-foreground text-xs font-medium tracking-[0.14em] uppercase">
               Job Hunt
             </p>
-            <p className="mt-1 text-xl font-semibold tracking-tight text-sidebar-foreground">
+            <p className="text-sidebar-foreground mt-1 text-xl font-semibold tracking-tight">
               Workspace
             </p>
           </div>
           <SidebarNav pathname={pathname} className="flex-1" />
-          <div className="mt-auto border-t border-sidebar-border px-3 pt-5">
-            <p className="truncate text-sm font-medium text-sidebar-foreground">
+          <div className="border-sidebar-border mt-auto border-t px-3 pt-5">
+            <p className="text-sidebar-foreground truncate text-sm font-medium">
               {userName}
             </p>
-            <p className="truncate text-xs text-muted-foreground">{userEmail}</p>
+            <p className="text-muted-foreground truncate text-xs">
+              {userEmail}
+            </p>
           </div>
         </aside>
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-3 border-b border-border/80 bg-background/92 px-4 backdrop-blur-sm md:px-8">
+          <header className="border-border/80 bg-background/92 sticky top-0 z-20 flex h-16 items-center justify-between gap-3 border-b px-4 backdrop-blur-sm md:px-8">
             <div className="flex items-center gap-2 md:hidden">
               <Sheet open={open} onOpenChange={setOpen}>
                 <SheetTrigger
@@ -85,10 +87,10 @@ export function WorkspaceShell({
             </div>
 
             <div className="hidden md:block">
-              <p className="text-sm font-medium text-foreground">
+              <p className="text-foreground text-sm font-medium">
                 Private owner workspace
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 Dashboard foundation and navigation shell
               </p>
             </div>
@@ -102,7 +104,7 @@ export function WorkspaceShell({
 
           <nav
             aria-label="Mobile primary"
-            className="sticky bottom-0 grid grid-cols-4 border-t border-border bg-background px-2 py-2 md:hidden"
+            className="border-border bg-background sticky bottom-0 grid grid-cols-4 border-t px-2 py-2 md:hidden"
           >
             {mobilePrimaryNav.map((item) => (
               <Link
@@ -110,12 +112,12 @@ export function WorkspaceShell({
                 href={item.enabled ? item.href : "#"}
                 aria-disabled={!item.enabled}
                 className={cn(
-                  "rounded-md px-2 py-2 text-center text-xs outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                  "focus-visible:ring-ring rounded-md px-2 py-2 text-center text-xs outline-none focus-visible:ring-2",
                   item.enabled
                     ? pathname.startsWith(item.href)
-                      ? "font-medium text-foreground"
+                      ? "text-foreground font-medium"
                       : "text-muted-foreground"
-                    : "pointer-events-none text-muted-foreground/60",
+                    : "text-muted-foreground/60 pointer-events-none",
                 )}
                 tabIndex={item.enabled ? 0 : -1}
               >

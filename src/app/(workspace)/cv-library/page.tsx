@@ -30,8 +30,7 @@ function formatBytes(size: number) {
 
 function getFeedback(
   searchParams:
-    | Promise<Record<string, string | string[] | undefined>>
-    | undefined,
+    Promise<Record<string, string | string[] | undefined>> | undefined,
 ): Promise<{ success?: string; error?: string }> {
   return Promise.resolve(searchParams).then((params) => {
     const getValue = (key: string) => {
@@ -116,13 +115,13 @@ export default async function CvLibraryPage({
 
       <div className="space-y-2">
         <h1 className="text-3xl font-semibold tracking-tight">CV Library</h1>
-        <p className="max-w-3xl text-sm leading-6 text-muted-foreground">
+        <p className="text-muted-foreground max-w-3xl text-sm leading-6">
           Upload private CV files, extract text, review candidate facts, and
           choose a default version for outreach.
         </p>
       </div>
 
-      <Card className="rounded-2xl border-border/80 shadow-none">
+      <Card className="border-border/80 rounded-2xl shadow-none">
         <CardHeader>
           <CardTitle>Upload CV</CardTitle>
           <CardDescription>
@@ -135,7 +134,7 @@ export default async function CvLibraryPage({
         </CardContent>
       </Card>
 
-      <Card className="rounded-2xl border-border/80 shadow-none">
+      <Card className="border-border/80 rounded-2xl shadow-none">
         <CardHeader>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
@@ -145,7 +144,10 @@ export default async function CvLibraryPage({
                 profiles.
               </CardDescription>
             </div>
-            <Badge variant="secondary" className="rounded-full px-3 py-1 text-xs">
+            <Badge
+              variant="secondary"
+              className="rounded-full px-3 py-1 text-xs"
+            >
               {resumes.length} {resumes.length === 1 ? "file" : "files"}
             </Badge>
           </div>
@@ -155,7 +157,7 @@ export default async function CvLibraryPage({
             <EmptyState
               title="No CVs yet"
               description="Upload a PDF or DOCX to create your first private CV record."
-              className="rounded-2xl border-border/80 bg-background/70 px-6 py-8 shadow-none"
+              className="border-border/80 bg-background/70 rounded-2xl px-6 py-8 shadow-none"
             />
           ) : (
             resumes.map((resume) => {
@@ -164,12 +166,12 @@ export default async function CvLibraryPage({
               return (
                 <div
                   key={resume.id}
-                  className="space-y-4 rounded-2xl border border-border/80 bg-background/70 p-4"
+                  className="border-border/80 bg-background/70 space-y-4 rounded-2xl border p-4"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0 space-y-1">
                       <p className="font-medium">{resume.name}</p>
-                      <p className="truncate text-sm text-muted-foreground">
+                      <p className="text-muted-foreground truncate text-sm">
                         {resume.originalFileName}
                       </p>
                       <div className="flex flex-wrap gap-2 pt-1">
@@ -203,7 +205,7 @@ export default async function CvLibraryPage({
                   </div>
 
                   {resume.extractionError ? (
-                    <p className="text-sm text-destructive">
+                    <p className="text-destructive text-sm">
                       {resume.extractionError}
                     </p>
                   ) : null}

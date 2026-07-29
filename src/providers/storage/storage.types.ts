@@ -39,7 +39,10 @@ export type StoredCvRef = {
   userId: string;
   storageKey: string;
   storageProvider: CvStorageProviderName;
-  storageMetadata?: Record<string, string | number | boolean | null | undefined>;
+  storageMetadata?: Record<
+    string,
+    string | number | boolean | null | undefined
+  >;
 };
 
 export type StoredCvObject = {
